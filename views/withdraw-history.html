@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Withdraw History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #28a745;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 650px;
+    }
+
+    thead {
+      background-color: #28a745;
+      color: white;
+    }
+
+    th, td {
+      padding: 14px 18px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 15px;
+    }
+
+    tr:hover {
+      background-color: #f1f9ff;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      text-transform: capitalize;
+    }
+
+    .pending { background-color: #fff3cd; color: #856404; }
+    .approved { background-color: #d4edda; color: #155724; }
+    .rejected { background-color: #f8d7da; color: #721c24; }
+    
+    /* নতুন স্টাইল: কোনো ইতিহাস না থাকলে */
+    #no-history-message {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      margin-top: 50px;
+      display: none; /* ডিফল্টভাবে লুকানো থাকবে */
+    }
+
+    @media (max-width: 700px) {
+      table { font-size: 13px; min-width: 100%; }
+      th, td { padding: 10px; }
+      h2 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h2><i class="fas fa-money-bill-wave"></i> Withdraw History</h2>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><i class="fas fa-coins"></i> Amount</th>
+          <th><i class="fas fa-credit-card"></i> Method</th>
+          <th><i class="fas fa-phone"></i> Number</th>
+          <th><i class="fas fa-info-circle"></i> Status</th>
+          <th><i class="fas fa-calendar-alt"></i> Time</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+
+  <!-- নতুন HTML: কোনো ইতিহাস না থাকলে এই মেসেজটি দেখাবে -->
+  <div id="no-history-message">
+    <p><i class="fas fa-history"></i> কোনো উইথড্র ইতিহাস পাওয়া যায়নি।</p>
+  </div>
+
+  <script>
+    async function loadHistory() {
+      const res = await fetch('/api/withdraw-history', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      });
+      const data = await res.json();
+      const tableBody = document.getElementById('historyTable');
+      const noHistoryMessage = document.getElementById('no-history-message');
+
+      tableBody.innerHTML = ''; // টেবিল খালি করা
+
+      // শর্ত: যদি data এর অ্যারে খালি থাকে, তাহলে মেসেজটি দেখাবে।
+      if (data.length === 0) {
+        noHistoryMessage.style.display = 'block';
+      } else {
+        noHistoryMessage.style.display = 'none';
+        data.forEach(item => {
+          const status = item.status || 'pending';
+          let icon = '';
+          if (status === 'approved') icon = '<i class="fas fa-check-circle"></i>';
+          else if (status === 'rejected') icon = '<i class="fas fa-times-circle"></i>';
+          else icon = '<i class="fas fa-hourglass-half"></i>';
+
+          const row = `
+            <tr>
+              <td>${item.amount}</td>
+              <td><i class="fas fa-university"></i> ${item.method}</td>
+              <td>${item.number}</td>
+              <td><span class="status ${status}">${icon} ${status}</span></td>
+              <td>${new Date(item.createdAt).toLocaleString()}</td>
+            </tr>
+          `;
+          tableBody.innerHTML += row;
+        });
+      }
+    }
+
+    loadHistory();
+  </script>
+
+</body>
+</html>
+

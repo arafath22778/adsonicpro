@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>HTML</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .package-table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .package-table th, .package-table td {
+    text-align: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .package-table th {
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .package-table tr:last-child td {
+    border-bottom: none;
+  }
+  .package-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  .package-table .package-name {
+    font-weight: bold;
+  }
+  /* @media (max-width: 600px) {
+    .package-table, .package-table tbody, .package-table tr, .package-table td {
+      display: block;
+      width: 100%;
+    }
+    .package-table thead {
+      display: none;
+    }
+    .package-table tr {
+      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+    .package-table td {
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+    }
+    .package-table td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 10px;
+      font-weight: bold;
+      text-align: left;
+    }
+  } */
+  </style>
+</head>
+
+<body>
+<table class="package-table">
+  <thead>
+    <tr>
+      <th>Package Price</th>
+      <th>Daily Income</th>
+      <th>Monthly Income</th>
+      <th>Bonus Income</th>
+      <th>Validity</th>
+      <th>Total Profit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="Package Price">৳300</td>
+      <td data-label="Daily Income">৳10</td>
+      <td data-label="Monthly Income">৳300</td>
+      <td data-label="Bonus Income">৳1 - ৳5</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳300+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳500</td>
+      <td data-label="Daily Income">৳15</td>
+      <td data-label="Monthly Income">৳450</td>
+      <td data-label="Bonus Income">৳5 - ৳10</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳450+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳1000</td>
+      <td data-label="Daily Income">৳35</td>
+      <td data-label="Monthly Income">৳1050</td>
+      <td data-label="Bonus Income">৳10 - ৳20</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳1050+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳5000</td>
+      <td data-label="Daily Income">৳180</td>
+      <td data-label="Monthly Income">৳5400</td>
+      <td data-label="Bonus Income">৳50 - ৳100</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳5400+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳10000</td>
+      <td data-label="Daily Income">৳370</td>
+      <td data-label="Monthly Income">৳11100</td>
+      <td data-label="Bonus Income">৳100 - ৳200</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳11100+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳20000</td>
+      <td data-label="Daily Income">৳750</td>
+      <td data-label="Monthly Income">৳22500</td>
+      <td data-label="Bonus Income">৳200 - ৳400</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳22500+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳40000</td>
+      <td data-label="Daily Income">৳1500</td>
+      <td data-label="Monthly Income">৳45000</td>
+      <td data-label="Bonus Income">৳400 - ৳800</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳45000+</td>
+    </tr>
+    <tr>
+      <td data-label="Package Price">৳50000</td>
+      <td data-label="Daily Income">৳1800</td>
+      <td data-label="Monthly Income">৳54000</td>
+      <td data-label="Bonus Income">৳500 - ৳1000</td>
+      <td data-label="Validity">30 Days</td>
+      <td data-label="Total Profit">৳54000+</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

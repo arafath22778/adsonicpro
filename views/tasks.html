@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tasks | Ads Watch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      position: relative; /* ইনফো আইকনের পজিশনিং এর জন্য */
+    }
+    h2 {
+      text-align: center;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .status-info {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.1em;
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #c2e0f4;
+    }
+    .status-info p {
+      margin: 6px 0;
+    }
+    .status-info span {
+      font-weight: bold;
+      color: #0d47a1;
+    }
+    video {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+    .btn i {
+      margin-right: 8px;
+    }
+    .btn-start {
+      background-color: #2196f3;
+      color: white;
+    }
+    .btn-start:hover {
+      background-color: #1e88e5;
+    }
+    .btn-submit {
+      background-color: #4caf50;
+      color: white;
+    }
+    .btn-submit:hover {
+      background-color: #43a047;
+    }
+    .btn[disabled] {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+    #noTasksMsg {
+      text-align: center;
+      color: #2e7d32;
+      font-weight: bold;
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-radius: 8px;
+    }
+    #noPackageMsg {
+      text-align: center;
+      color: #c62828;
+      font-weight: bold;
+      margin-top: 20px;
+      padding: 15px;
+      background: #ffebee;
+      border-radius: 8px;
+    }
+    
+    /* নতুন স্টাইল: ইনফো বাটন এবং পপ-আপের জন্য */
+    .info-icon {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        color: #1e3a8a;
+        cursor: pointer;
+        font-size: 20px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        animation: fadeIn 0.3s;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        animation: slideIn 0.3s;
+    }
+    .modal-content h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    .modal-content p {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.5;
+    }
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close-btn:hover, .close-btn:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <i class="fas fa-info-circle info-icon" id="infoIcon"></i> <!-- নতুন ইনফো আইকন -->
+    <h2><i class="fas fa-play-circle"></i> Your Daily Ads</h2>
+    <div id="statusInfo" class="status-info" style="display: none;">
+      <p>Total Ads: <span id="totalAds">...</span></p>
+      <p>Watched Today: <span id="adsWatched">...</span></p>
+      <p>Remaining: <span id="adsRemaining">...</span></p>
+    </div>
+
+    <div id="taskSection" style="display: none;">
+      <video id="adVideo" preload="auto"></video>
+      <button id="actionBtn" class="btn btn-start"><i class="fas fa-play"></i> Start</button>
+    </div>
+
+    <div id="noPackageMsg" style="display: none;">
+      ❌ আপনার কোনো সক্রিয় প্যাকেজ নেই। বিজ্ঞাপন দেখতে প্রথমে একটি প্যাকেজ কিনুন।
+    </div>
+
+    <div id="noTasksMsg" style="display: none;">
+      🎉 আজকের সব বিজ্ঞাপন দেখা সম্পূর্ণ হয়েছে। আগামীকাল আবার আসবেন!
+    </div>
+  </div>
+
+  <!-- পপ-আপের জন্য নতুন HTML -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3>টাস্ক কিভাবে কাজ করে?</h3>
+      <p>আপনার প্রতিদিনের টাস্ক হল বিজ্ঞাপন দেখা। আপনার কেনা প্যাকেজ অনুযায়ী আপনি প্রতিদিন নির্দিষ্ট সংখ্যক বিজ্ঞাপন দেখতে পারবেন। বিজ্ঞাপন শুরু করার জন্য 'Start' বাটনে ক্লিক করুন। বিজ্ঞাপন দেখা শেষ হলে 'Submit' বাটনে ক্লিক করে টাস্কটি সম্পন্ন করুন। প্রতিটি টাস্ক সম্পন্ন করার জন্য আপনার ব্যালেন্সে ২০ টাকা যোগ হবে অটোমেটিক । প্রতিদিনের এড প্রতিদিন দেখতে হবে এড বাকি থাকলে এটি আর পরবর্তী দিন দেখতে পারবেননা। </p>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const adVideo = document.getElementById('adVideo');
+    const actionBtn = document.getElementById('actionBtn');
+    const statusInfo = document.getElementById('statusInfo');
+    const noPackageMsg = document.getElementById('noPackageMsg');
+    const noTasksMsg = document.getElementById('noTasksMsg');
+    const totalAdsElem = document.getElementById('totalAds');
+    const adsWatchedElem = document.getElementById('adsWatched');
+    const adsRemainingElem = document.getElementById('adsRemaining');
+
+    // ✅ এখানে আপনার সকল বিজ্ঞাপনের ভিডিও URL যুক্ত করুন
+    const adVideoUrls = [
+      "https://www.w3schools.com/html/mov_bbb.mp4",
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    ];
+    let currentAdIndex = 0;
+
+    async function loadTaskStatus() {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      try {
+        const res = await fetch('/api/tasks/status', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (data.hasPackage) {
+            statusInfo.style.display = 'block';
+            totalAdsElem.innerText = data.adsLimit;
+            adsWatchedElem.innerText = data.adsWatched;
+            adsRemainingElem.innerText = data.adsLimit - data.adsWatched;
+
+            if (data.adsWatched < data.adsLimit) {
+              document.getElementById('taskSection').style.display = 'block';
+              loadRandomAd();
+            } else {
+              noTasksMsg.style.display = 'block';
+            }
+          } else {
+            noPackageMsg.style.display = 'block';
+          }
+        } else {
+          alert(data.message || 'Error fetching task status.');
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert('Server error. Please try again.');
+      }
+    }
+
+    function loadRandomAd() {
+      // ✅ র্যান্ডমলি একটি বিজ্ঞাপন বাছাই করা
+      currentAdIndex = Math.floor(Math.random() * adVideoUrls.length);
+      adVideo.src = adVideoUrls[currentAdIndex];
+      actionBtn.innerHTML = '<i class="fas fa-play"></i> Start';
+      actionBtn.className = 'btn btn-start';
+      actionBtn.disabled = false;
+    }
+
+    actionBtn.addEventListener('click', () => {
+      if (actionBtn.querySelector('i').classList.contains('fa-play')) {
+        adVideo.play();
+        actionBtn.disabled = true;
+        
+        // বিজ্ঞাপন শেষ হওয়ার পর সাবমিট বাটন দেখাবে
+        adVideo.onended = () => {
+            actionBtn.innerHTML = '<i class="fas fa-check"></i> Submit';
+            actionBtn.className = 'btn btn-submit';
+            actionBtn.disabled = false;
+        };
+      } else if (actionBtn.querySelector('i').classList.contains('fa-check')) {
+        submitTask();
+      }
+    });
+
+    async function submitTask() {
+      actionBtn.disabled = true;
+      try {
+        const res = await fetch('/api/tasks/complete', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          alert('✅ Ad watched successfully! Balance updated.');
+          loadTaskStatus();
+        } else {
+          alert(data.message || "Something went wrong!");
+        }
+      } catch (err) {
+        console.error("Submit error:", err);
+        alert("Server error. Could not submit task.");
+      }
+    }
+
+    loadTaskStatus();
+
+    // নতুন JavaScript: পপ-আপের কার্যকারিতা
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById("infoModal");
+      const infoIcon = document.getElementById("infoIcon");
+      const closeBtn = document.getElementsByClassName("close-btn")[0];
+
+      infoIcon.onclick = function() {
+        modal.style.display = "block";
+      }
+
+      closeBtn.onclick = function() {
+        modal.style.display = "none";
+      }
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

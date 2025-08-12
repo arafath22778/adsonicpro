@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .notification-item {
+      background-color: #f9fafb;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease-in-out;
+    }
+    .notification-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+    .notification-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .notification-message {
+      margin-top: 0.5rem;
+      color: #4b5563;
+      font-size: 1rem;
+    }
+    .notification-date {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+    .hidden {
+      display: none;
+    }
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #22c55e;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">আপনার নোটিফিকেশনগুলো</h2>
+    
+    <div id="loading" class="loading-container">
+      <div class="spinner"></div> <span class="ml-2 text-gray-500">নোটিফিকেশন লোড হচ্ছে...</span>
+    </div>
+
+    <div id="notifications-list">
+      <!-- Notifications will be displayed here by JavaScript -->
+    </div>
+
+    <div id="no-notifications" class="text-center text-gray-500 my-4 hidden">
+        এখনও কোনো নোটিফিকেশন নেই।
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('token');
+        const notificationsList = document.getElementById('notifications-list');
+        const loadingDiv = document.getElementById('loading');
+        const noNotificationsDiv = document.getElementById('no-notifications');
+
+        if (!token) {
+            loadingDiv.classList.add('hidden');
+            noNotificationsDiv.innerText = "❌ এই পেজটি দেখতে আপনাকে লগইন করতে হবে।";
+            noNotificationsDiv.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/notifications', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await res.json();
+            loadingDiv.classList.add('hidden');
+
+            if (res.ok && data.notifications.length > 0) {
+                notificationsList.innerHTML = '';
+                data.notifications.forEach(notification => {
+                    const date = new Date(notification.createdAt).toLocaleDateString('bn-BD', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const notificationItem = document.createElement('div');
+                    notificationItem.classList.add('notification-item');
+                    notificationItem.innerHTML = `
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-date">তারিখ: ${date}</div>
+                    `;
+                    notificationsList.appendChild(notificationItem);
+                });
+            } else {
+                noNotificationsDiv.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error("Error fetching notifications:", err);
+            loadingDiv.classList.add('hidden');
+            noNotificationsDiv.innerText = 'নোটিফিকেশন লোড করতে সমস্যা হয়েছে।';
+            noNotificationsDiv.classList.remove('hidden');
+        }
+    });
+  </script>
+</body>
+</html>
+

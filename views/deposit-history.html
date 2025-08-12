@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deposit History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #007bff;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      min-width: 600px;
+    }
+
+    thead {
+      background-color: #007bff;
+      color: white;
+    }
+
+    th, td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    tr:hover {
+      background-color: #f1f9ff;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-transform: capitalize;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pending { background-color: #fff3cd; color: #856404; }
+    .approved { background-color: #d4edda; color: #155724; }
+    .rejected { background-color: #f8d7da; color: #721c24; }
+    
+    /* নতুন স্টাইল: কোনো ইতিহাস না থাকলে */
+    #no-history-message {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      margin-top: 50px;
+    }
+
+    /* Responsive message */
+    @media (max-width: 650px) {
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 10px 12px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2><i class="fas fa-money-check-alt"></i> Deposit History</h2>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th><i class="fas fa-coins"></i> Amount (৳)</th>
+        <th><i class="fas fa-credit-card"></i> Method</th>
+        <th><i class="fas fa-info-circle"></i> Status</th>
+        <th><i class="fas fa-calendar-alt"></i> Date</th>
+      </tr>
+    </thead>
+    <tbody id="depositTableBody"></tbody>
+  </table>
+</div>
+
+<!-- নতুন HTML: কোনো ইতিহাস না থাকলে এই মেসেজটি দেখাবে -->
+<div id="no-history-message" style="display: none;">
+  <p><i class="fas fa-history"></i> কোনো ডিপোজিট ইতিহাস পাওয়া যায়নি।</p>
+</div>
+
+<script>
+window.onload = async () => {
+  const res = await fetch('/api/deposit-history', {
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
+  });
+  const deposits = await res.json();
+  const tbody = document.getElementById('depositTableBody');
+  const noHistoryMessage = document.getElementById('no-history-message');
+
+  // শর্ত: যদি deposits এর অ্যারে খালি থাকে, তাহলে মেসেজটি দেখাবে।
+  if (deposits.length === 0) {
+    noHistoryMessage.style.display = 'block';
+  } else {
+    noHistoryMessage.style.display = 'none';
+    deposits.forEach(dep => {
+      const status = dep.status || "pending";
+      let icon = "";
+      if (status === 'approved') icon = '<i class="fas fa-check-circle"></i>';
+      else if (status === 'rejected') icon = '<i class="fas fa-times-circle"></i>';
+      else icon = '<i class="fas fa-hourglass-half"></i>';
+
+      const row = `
+        <tr>
+          <td>${dep.amount}</td>
+          <td><i class="fas fa-university"></i> ${dep.method}</td>
+          <td><span class="status ${status}">${icon} ${status}</span></td>
+          <td>${new Date(dep.createdAt).toLocaleString()}</td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  }
+};
+</script>
+
+</body>
+</html>
+

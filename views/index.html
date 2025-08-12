@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Auth App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      .logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo {
+        max-width: 200px; /* লোগোর সর্বোচ্চ প্রশস্ততা */
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container" id="form-box">
+        <div class="logo-container">
+          <img
+            src="https://ik.imagekit.io/ubdzcqpss/Lucid_Realism_A_sleek_modern_and_professional_logo_design_for__3-removebg-preview.png?updatedAt=1754931110372"
+            alt="Clickora Logo"
+            class="logo"
+          />
+        </div>
+        <h2 id="form-title">Login</h2>
+        <form id="authForm">
+          <input
+            type="text"
+            id="name"
+            placeholder="Your Name"
+            style="display: none"
+          />
+          <div style="display: flex; align-items: center">
+            <input
+              type="email"
+              id="email"
+              placeholder="Email"
+              required
+              style="flex-grow: 1"
+            />
+            <button
+              type="button"
+              id="sendOtpBtn"
+              onclick="sendOtp()"
+              style="display: none; margin-left: 5px"
+            >
+              Send OTP
+            </button>
+          </div>
+          <input
+            type="text"
+            id="otp"
+            placeholder="Enter OTP"
+            style="display: none"
+          />
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
+          <input
+            type="text"
+            id="referCode"
+            placeholder="Referral Code (Optional)"
+            style="display: none"
+          />
+          <button type="submit" id="submitBtn">Login</button>
+        </form>
+        <p id="message" style="font-weight: bold; margin-top: 10px"></p>
+        <p id="toggleText">
+          Don't have an account?
+          <a href="#" onclick="toggleForm()">Register</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      let isLogin = true;
+      let isOtpSent = false;
+
+      function toggleForm() {
+        isLogin = !isLogin;
+        isOtpSent = false;
+        document.getElementById("form-title").innerText = isLogin
+          ? "Login"
+          : "Register";
+        document.getElementById("submitBtn").innerText = isLogin
+          ? "Login"
+          : "Register";
+        document.getElementById("message").innerText = "";
+        document.getElementById("name").style.display = isLogin
+          ? "none"
+          : "block";
+        document.getElementById("sendOtpBtn").style.display = isLogin
+          ? "none"
+          : "block";
+        document.getElementById("otp").style.display = isLogin
+          ? "none"
+          : "block";
+        document.getElementById("referCode").style.display = isLogin
+          ? "none"
+          : "block";
+        document.getElementById("toggleText").innerHTML = isLogin
+          ? `Don't have an account? <a href="#" onclick="toggleForm()">Register</a>`
+          : `Already have an account? <a href="#" onclick="toggleForm()">Login</a>`;
+      }
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+          const referCodeInput = document.getElementById('referCode');
+          if (referCodeInput) {
+            referCodeInput.value = refCode;
+            toggleForm();
+          }
+        }
+      });
+
+      async function sendOtp() {
+        const email = document.getElementById("email").value;
+        const referCode = document.getElementById("referCode").value;
+        const messageEl = document.getElementById("message");
+        const sendOtpBtn = document.getElementById("sendOtpBtn");
+
+        if (!email) {
+          messageEl.style.color = "red";
+          messageEl.innerText = "Please enter your email address.";
+          return;
+        }
+
+        messageEl.style.color = "blue";
+        messageEl.innerText = "Sending OTP... Please wait.";
+        sendOtpBtn.disabled = true;
+
+        try {
+          const res = await fetch("/send-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, referCode }),
+          });
+
+          const text = await res.text();
+          sendOtpBtn.disabled = false;
+
+          if (res.ok) {
+            isOtpSent = true;
+            messageEl.style.color = "green";
+            messageEl.innerText = text;
+          } else {
+            messageEl.style.color = "red";
+            messageEl.innerText = text || "Failed to send OTP.";
+          }
+        } catch (err) {
+          sendOtpBtn.disabled = false;
+          messageEl.style.color = "red";
+          messageEl.innerText = "Network error. Please try again.";
+        }
+      }
+
+      document.getElementById("authForm").onsubmit = async function (e) {
+        e.preventDefault();
+        const messageEl = document.getElementById("message");
+        messageEl.innerText = "";
+
+        const route = isLogin ? "/login" : "/register";
+        const bodyData = {
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        };
+
+        if (!isLogin) {
+          bodyData.name = document.getElementById("name").value;
+          bodyData.otp = document.getElementById("otp").value;
+          bodyData.referCode = document.getElementById("referCode").value;
+        }
+
+        if (!isLogin && !isOtpSent) {
+          messageEl.style.color = "red";
+          messageEl.innerText = "Please send and verify OTP first.";
+          return;
+        }
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        messageEl.style.color = "blue";
+        messageEl.innerText = isLogin ? "Logging in..." : "Registering...";
+
+        try {
+          const res = await fetch(route, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bodyData),
+          });
+
+          const text = await res.text();
+          submitBtn.disabled = false;
+
+          if (res.ok) {
+            messageEl.style.color = "green";
+
+            if (isLogin) {
+              try {
+                const data = JSON.parse(text);
+                if (data.token) {
+                  localStorage.setItem("token", data.token);
+                  messageEl.innerText = "Login successful! Redirecting...";
+                  setTimeout(() => (window.location.href = "/dashboard"), 1000);
+                } else {
+                  messageEl.innerText = "Login success, but no token received.";
+                }
+              } catch {
+                messageEl.innerText = "Login successful.";
+              }
+            } else {
+              messageEl.innerText =
+                "Registration successful! You can now login.";
+              toggleForm();
+            }
+          } else {
+            messageEl.style.color = "red";
+            messageEl.innerText = text || "Something went wrong.";
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          messageEl.style.color = "red";
+          messageEl.innerText = "Network error. Please try again.";
+        }
+      };
+    </script>
+  </body>
+</html>

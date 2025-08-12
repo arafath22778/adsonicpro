@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redeem Bonus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* নতুন পপ-আপ এবং ইনফো আইকনের জন্য স্টাইল */
+    .info-icon {
+      position: absolute;
+      top: 25px; /* Adjust top position as needed */
+      right: 25px; /* Adjust right position as needed */
+      color: #28a745;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001; /* Make sure it's on top of other content */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      animation: slideIn 0.3s;
+    }
+
+    .modal-content h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    
+    .modal-content p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* আপনার বিদ্যমান স্টাইল */
+    .floating-contact-btn {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 60px;
+      height: 60px;
+      background-color: #0088CC;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0088CC, 0 0 20px #0088CC, 0 0 30px #0088CC, 0 0 40px #0088CC;
+      transition: all 0.3s ease-in-out;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1000;
+    }
+    
+    .floating-contact-btn.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .floating-contact-btn:hover {
+      box-shadow: 0 0 15px #0088CC, 0 0 25px #0088CC, 0 0 35px #0088CC, 0 0 45px #0088CC;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+      .floating-contact-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(145deg, #f0f0f0, #dfe4ea);
+      padding: 30px;
+    }
+    .container {
+      background: #ffffff;
+      padding: 25px 30px;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      position: relative; /* Add this to position the info icon */
+    }
+    .container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 22px;
+    }
+    .container h2 i {
+      color: #28a745;
+      margin-right: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #msg {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Existing telegram button -->
+  <a href="https://t.me/+EirMes039t1iNDhl" target="_blank" class="floating-contact-btn" title="Telegram-এ আমাদের সাথে যোগাযোগ করুন">
+    <i class="fab fa-telegram-plane"></i>
+  </a>
+  
+  <div class="container">
+    <i class="fas fa-info-circle info-icon" id="infoIcon"></i> <!-- নতুন ইনফো আইকন -->
+    <h2><i class="fas fa-gift"></i>Redeem Your Bonus</h2>
+    <input type="text" id="bonusCode" placeholder="Enter your bonus code here...">
+    <button onclick="redeemCode()"><i class="fas fa-check-circle"></i> Redeem Code</button>
+    <div id="msg"></div>
+  </div>
+
+  <!-- পপ-আপের জন্য নতুন HTML -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3>বোনাস কোড কিভাবে পাবেন?</h3>
+      <p>বোনাস কোড পেতে আমাদের টেলিগ্রাম গ্রুপে যুক্ত হোন। অ্যাডমিন প্রতিদিন রাত ৮ টায়  নতুন বোনাস কোড সেখানে প্রকাশ করবেন। এই কোডগুলো ৫ মিনিটের জন্য থাকবে বোনাস কোড লিখে এখনে <b>"Redeem Code" </b>এ ক্লিক করলে আপনার একাউন্টে ৮-২০ টাকা যুক্ত হবে।</p>
+    </div>
+  </div>
+
+  <script>
+    // আপনার বিদ্যমান redeemCode() ফাংশন
+    async function redeemCode() {
+      const code = document.getElementById('bonusCode').value.trim();
+      const token = localStorage.getItem('token');
+
+      const res = await fetch('/api/bonus/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ code })
+      });
+
+      const msg = await res.text();
+      const msgDiv = document.getElementById('msg');
+      msgDiv.innerText = msg;
+      msgDiv.style.color = res.ok ? 'green' : 'red';
+    }
+    
+    // আপনার বিদ্যমান স্ক্রল ইভেন্ট
+    document.addEventListener('DOMContentLoaded', () => {
+      const telegramBtn = document.querySelector('.floating-contact-btn');
+      let scrollTimeout;
+
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        telegramBtn.classList.add('hide');
+
+        scrollTimeout = setTimeout(() => {
+          telegramBtn.classList.remove('hide');
+        }, 350);
+      });
+    });
+
+    // পপ-আপের জন্য নতুন JavaScript
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById("infoModal");
+      const infoIcon = document.getElementById("infoIcon");
+      const closeBtn = document.getElementsByClassName("close-btn")[0];
+
+      infoIcon.onclick = function() {
+        modal.style.display = "block";
+      }
+
+      closeBtn.onclick = function() {
+        modal.style.display = "none";
+      }
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

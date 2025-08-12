@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   
+  <meta charset="UTF-8">
+    <title>Buy Package</title>
+   
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font Awesome for icons -->
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+    /* Global Body and Text Styles */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eef5ff;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+
+    /* Headings */
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      position: relative;
+    }
+
+    h3 {
+      color: #555;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    /* User Info Section */
+    #user-info {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 10px;
+    }
+
+    #user-info p {
+      margin: 5px 0;
+      font-size: 1.1rem;
+    }
+
+    /* Packages Container */
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      /* Reduced gap */
+      justify-content: center;
+      padding-bottom: 20px;
+    }
+
+    /* Package Card Styling */
+    .card {
+      background: #ffffff;
+      /* লোডিং-এর সময় একটি ব্যাকগ্রাউন্ড কালার ব্যবহার করা হচ্ছে */
+      padding: 15px;
+      /* Reduced padding */
+      border-radius: 15px;
+      width: 250px;
+      /* Reduced card width */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      z-index: 0;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      text-align: center;
+    }
+
+    .card h4 {
+      margin-top: 0;
+      color: #007bff;
+      font-size: 1.5rem;
+      /* Reduced font size */
+      padding-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      margin: 8px 0;
+      /* Reduced margin */
+      font-size: 1.3rem;
+      /* Reduced font size */
+      color: #555;
+    }
+
+    .card p strong {
+      color: #000;
+    }
+
+    .card .benefits {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-bottom: 20px;
+    }
+
+    /* Button Styling */
+    button {
+      padding: 12px;
+      /* Reduced padding */
+      width: 100%;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      /* Reduced font size */
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin-top: auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    /* Universal Popup Styles */
+    #universalPopup {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #universalPopup>div {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      position: relative;
+      max-width: 90%;
+      font-size: 1rem;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #aaa;
+      transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+      color: #777;
+    }
+
+    /* Toast Message Styles */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ffffff;
+      color: #333;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 9999;
+      font-size: 1rem;
+    }
+
+    .toast.success {
+      border-left: 6px solid #28a745;
+    }
+
+    .toast.error {
+      border-left: 6px solid #dc3545;
+    }
+
+    /* Responsive adjustments for mobile devices */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 350px;
+      }
+
+      #user-info p {
+        display: block;
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <h2><i class="fas fa-box-open"></i> Buy Package</h2>
+        <div id="universalPopup"
+      style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+            <div
+        style="background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); text-align: center; position: relative;">
+                <span onclick="hideUniversalPopup()" class="close-btn">&times;</span>
+                <p id="popupContent"></p>
+              </div>
+          </div>
+        <i       class="fas fa-info-circle"      
+      style="position: absolute; top: 25px; right: 25px; color: #007bff; cursor: pointer; font-size: 24px;"      
+      onclick="showUniversalPopup('একজন ব্যক্তি যতবার মনে চায় ততবার একই package কিনতে পারবে।আর ভিন্ন package তো আছেই। ৫০০০ বা তার থেকে বড় package কিনলে একাধিক এড একসাথে দেখতে পারবে।')"    ></i>
+        <div id="user-info"></div>
+        <h3>Available Packages:</h3>
+        <div id="packages" class="flex"></div>
+      </div>
+
+    <!-- Toast Message -->
+    <div id="toast" class="toast"></div>
+
+   
+  <script>
+    // Function to show toast messages
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    // Function to load and display user information
+    async function loadUserInfo() {
+      try {
+        const res = await fetch('/api/user-info', {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch user info');
+        }
+
+        const user = await res.json();
+        const container = document.getElementById('user-info');
+        container.innerHTML = `
+          <p><strong><i class="fas fa-user"></i> Name:</strong> ${user.name}</p>
+          <p><strong><i class="fas fa-wallet"></i> Balance:</strong> ${user.balance} ৳</p>
+          <p><strong><i class="fas fa-bullhorn"></i> Ads per Day:</strong> ${user.totalAdsPerDay || 0}</p>
+        `;
+      } catch (error) {
+        console.error("Error loading user info:", error);
+        showToast('Failed to load user information.', 'error');
+      }
+    }
+
+    // আপনার দেওয়া original ইমেজ URL গুলো এখানে ব্যবহার করা হচ্ছে
+    const packageImages = {
+      "Basic": "https://static.vecteezy.com/system/resources/thumbnails/054/141/632/small/lush-green-foliage-in-a-vibrant-outdoor-setting-depicting-nature-s-beauty-during-daylight-hours-photo.jpeg",
+      "Standard": "https://static.vecteezy.com/system/resources/thumbnails/049/671/177/small/tiger-amazing-background-hd-wallpaper-photo.jpeg",
+      "Pro": "https://www.shutterstock.com/image-photo/hd-wallpaper-mountains-landscapes-moon-260nw-2389525731.jpg",
+      "Elite": "https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/john-doe-2rhz3Nuq12c-unsplash.jpg?updatedAt=1754966833500",
+      "Business": "https://ik.imagekit.io/ubdzcqpss/hakon-sataoen-qyfco1nfMtg-unsplash.jpg?updatedAt=1754966532950",
+      "VIP":"https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/mateusz-d-xOoQVVHdMe0-unsplash.jpg?updatedAt=1754966835931",
+      "Mega":"https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/serge-kutuzov-nm_UwlzQe_Q-unsplash.jpg?updatedAt=1754966832022",
+      "Enterprise":"https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/flavien-1WXjoRZeWq4-unsplash.jpg?updatedAt=1754966830368",
+      "Ultimate":"https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/flavien-1WXjoRZeWq4-unsplash.jpg?updatedAt=1754966830368",
+      "Premium":"https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/jingming-pan-iYsrkq5qq0Q-unsplash.jpg?updatedAt=1754966837299",
+      "Diamond": "https://ik.imagekit.io/ubdzcqpss/Earn-app-imgs/package11.webp?tr=w-300"
+    };
+
+    // Function to load and display packages
+    async function loadPackages() {
+      try {
+        const res = await fetch('/api/packages');
+        if (!res.ok) {
+          throw new Error('Failed to fetch packages');
+        }
+
+        const packages = await res.json();
+        const container = document.getElementById('packages');
+        container.innerHTML = '';
+
+        packages.forEach((pkg) => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          // ✅ ছবির URL সরাসরি background-image তে না দিয়ে data-bg-image অ্যাট্রিবিউটে রাখা হচ্ছে
+          const imageUrl = packageImages[pkg.name] || 'https://placehold.co/400x300';
+          div.setAttribute('data-bg-image', imageUrl);
+
+          // Calculate extra ads for packages with price >= 5000
+          let adsDisplay = `<b>${pkg.adsPerDay}</b>`;
+          if (pkg.price >= 5000) {
+            const extraAds = Math.floor(pkg.price / 500); // e.g., 5000 -> 10, 10000 -> 20
+            adsDisplay = `<b>${pkg.adsPerDay}</b> (একসাথে ${extraAds}টি)`;
+          }
+
+          div.innerHTML = `
+            <div class="card-content">
+              <h4><i class="fas fa-box-open"></i> ${pkg.name}</h4>
+              <div class="benefits">
+                <p><i class="fas fa-money-bill-wave"></i> <b>Price:</b> <strong>${pkg.price} ৳</strong></p>
+                <p><i class="fas fa-ad"></i> <b>Ads/Day:</b> ${adsDisplay}</p>
+              </div>
+              <button onclick="buyPackage('${pkg._id}')"><i class="fas fa-shopping-cart"></i> Buy Now</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+
+        // ✅ প্যাকেজ লোড হওয়ার পর lazy loading শুরু করা হচ্ছে
+        setupLazyLoading();
+      } catch (error) {
+        console.error("Error loading packages:", error);
+        showToast('Failed to load packages.', 'error');
+      }
+    }
+    
+    // ✅ এই নতুন ফাংশনটি IntersectionObserver ব্যবহার করে Lazy Loading চালু করবে
+    function setupLazyLoading() {
+        const cards = document.querySelectorAll('.card');
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const card = entry.target;
+                    const imageUrl = card.getAttribute('data-bg-image');
+                    if (imageUrl) {
+                        card.style.backgroundImage = `url('${imageUrl}')`;
+                        observer.unobserve(card); // ছবি লোড হয়ে গেলে observer বন্ধ করে দেওয়া
+                    }
+                }
+            });
+        });
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    }
+
+    // Function to handle package purchase
+    async function buyPackage(id) {
+      try {
+        const res = await fetch('/api/buy-package', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify({ packageId: id })
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          showToast(result.message, 'success');
+          loadUserInfo();
+        } else {
+          showToast("❌ " + result.message, 'error');
+        }
+
+      } catch (error) {
+        console.error("Package purchase failed", error);
+        showToast("❌ Something went wrong. Try again.", 'error');
+      }
+    }
+
+    function showUniversalPopup(message) {
+      document.getElementById('popupContent').innerText = message;
+      document.getElementById('universalPopup').style.display = 'flex';
+    }
+
+    function hideUniversalPopup() {
+      document.getElementById('universalPopup').style.display = 'none';
+    }
+
+    // Close popup if user clicks outside the content
+    window.addEventListener('click', (event) => {
+      const popup = document.getElementById('universalPopup');
+      if (event.target === popup) {
+        hideUniversalPopup();
+      }
+    });
+
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserInfo();
+      loadPackages();
+    });
+  </script>
+</body>
+
+</html>

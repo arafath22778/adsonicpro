@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deposit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .info-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: #007bff;
+      cursor: pointer;
+      font-size: 20px;
+      transition: color 0.3s;
+    }
+    
+    .info-icon:hover {
+      color: #0056b3;
+    }
+
+    .wallet {
+      background: #f1f1f1;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .wallet:hover {
+      background: #e0e0e0;
+    }
+
+    .wallet i {
+      color: #007bff;
+    }
+
+    .copied {
+      color: green;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex; /* Flexbox for aligning icon and text */
+      justify-content: center;
+      align-items: center;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Popup styles */
+    .popup-container {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      position: relative;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #aaa;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+    }
+    .floating-contact-btn {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        width: 60px;
+        height: 60px;
+        background-color: #0088cc;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 0 10px #0088cc, 0 0 20px #0088cc, 0 0 30px #0088cc,
+          0 0 40px #0088cc;
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+        pointer-events: auto;
+        z-index: 1000;
+      }
+
+      .floating-contact-btn.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .floating-contact-btn:hover {
+        box-shadow: 0 0 15px #0088cc, 0 0 25px #0088cc, 0 0 35px #0088cc,
+          0 0 45px #0088cc;
+        transform: scale(1.1);
+      }
+
+      /* Loader/Spinner animation */
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: none; /* Initially hidden */
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+  </style>
+</head>
+<body>
+<a
+      href="https://t.me/+EirMes039t1iNDhl"
+      target="_blank"
+      class="floating-contact-btn"
+      title="Telegram-এ আমাদের সাথে যোগাযোগ করুন"
+    >
+      <i class="fab fa-telegram-plane"></i>
+    </a>
+<div class="container">
+  <h2><i class="fas fa-wallet"></i> Deposit <i class="fas fa-info-circle info-icon" id="infoButton"></i></h2>
+
+  <p><strong>Send money to one of these numbers:</strong></p>
+
+  <div class="wallet" onclick="copyToClipboard('01613606769', this)">
+    <span><i class="fab fa-btc"></i> Bkash: <strong>01613606769</strong></span>
+    <i class="fas fa-copy"></i>
+  </div>
+
+  <div class="wallet" onclick="copyToClipboard('01613606769', this)">
+    <span><i class="fas fa-bolt"></i> Nagad: <strong>01613606769</strong></span>
+    <i class="fas fa-copy"></i>
+  </div>
+
+  <div class="wallet" onclick="copyToClipboard('01613606769', this)">
+    <span><i class="fas fa-rocket"></i> Rocket: <strong>01613606769</strong></span>
+    <i class="fas fa-copy"></i>
+  </div>
+
+  <form id="depositForm" enctype="multipart/form-data">
+    <input type="number" name="amount" placeholder="Amount (৳) Minimum 200 ৳" required>
+    <input type="text" name="phone" placeholder="Your Mobile Number" required>
+    <input type="text" name="transactionId" placeholder="Transaction ID" required>
+
+    <select name="method" required>
+      <option value="">Select Method</option>
+      <option value="bkash">Bkash</option>
+      <option value="nagad">Nagad</option>
+      <option value="rocket">Rocket</option>
+    </select>
+
+    <input type="file" name="screenshot" accept="image/*">
+
+    <button type="submit" id="submitButton">
+      <span id="buttonText"><i class="fas fa-paper-plane"></i> Submit</span>
+      <span id="loadingSpinner" class="loader" style="display: none;"></span>
+    </button>
+  </form>
+
+  <p id="message"></p>
+</div>
+
+<div id="infoPopup" class="popup-container">
+  <div class="popup-content">
+    <span class="close-btn" id="closeButton">&times;</span>
+    <h2 style="color:black;">
+      ডিপোজিট করার ৫ মিনিটের মধ্যে আপনার একাউন্টে টাকা যোগ হবে । যদি কোনো কারণে টাকা যোগ না হয় আমাদের সাথে যোগাযোগ করুন।
+      <b style="color:#0088cc;"><a>arafathrhaman0@gmail.com</a></b>
+    </h2>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(number, el) {
+    navigator.clipboard.writeText(number).then(() => {
+      const original = el.innerHTML;
+      el.innerHTML = `<span class="copied">✅ Copied ${number}</span>`;
+      setTimeout(() => el.innerHTML = original, 1500);
+    });
+  }
+
+  document.getElementById('depositForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitButton = document.getElementById('submitButton');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const msgEl = document.getElementById('message');
+
+    const amount = parseFloat(formData.get('amount'));
+    if (isNaN(amount) || amount < 200) {
+      msgEl.textContent = "❌ Minimum deposit is 200৳.";
+      msgEl.style.color = "red";
+      return;
+    }
+
+    // Show loading state
+    submitButton.disabled = true;
+    buttonText.textContent = "Submitting...";
+    loadingSpinner.style.display = 'block';
+    msgEl.textContent = "";
+
+    try {
+      const res = await fetch('/deposit', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: formData
+      });
+
+      const text = await res.text();
+      msgEl.textContent = text;
+      msgEl.style.color = res.ok ? 'green' : 'red';
+      form.reset(); // Clear the form on successful submission
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      msgEl.textContent = "❌ Error submitting form. Please try again.";
+      msgEl.style.color = 'red';
+    } finally {
+      // Hide loading state
+      submitButton.disabled = false;
+      buttonText.innerHTML = `<i class="fas fa-paper-plane"></i> Submit`;
+      loadingSpinner.style.display = 'none';
+    }
+  });
+
+  document.getElementById('infoButton').addEventListener('click', () => {
+    document.getElementById('infoPopup').style.display = 'flex';
+  });
+  
+  document.getElementById('closeButton').addEventListener('click', () => {
+    document.getElementById('infoPopup').style.display = 'none';
+  });
+  
+  window.addEventListener('click', (event) => {
+    const popup = document.getElementById('infoPopup');
+    if (event.target === popup) {
+      popup.style.display = 'none';
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const telegramBtn = document.querySelector(".floating-contact-btn");
+    let scrollTimeout;
+
+    window.addEventListener("scroll", () => {
+      clearTimeout(scrollTimeout);
+      telegramBtn.classList.add("hide");
+
+      scrollTimeout = setTimeout(() => {
+        telegramBtn.classList.remove("hide");
+      }, 350);
+    });
+  });
+</script>
+
+</body>
+</html>
+

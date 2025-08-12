@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .form-group label {
+      font-weight: 600;
+      color: #374151;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      background-color: #f9fafb;
+      transition: all 0.2s ease-in-out;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(to right, #16a34a, #15803d);
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .message-box {
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        text-align: center;
+    }
+    .message-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    .message-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 2rem;
+        border-radius: 1rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        max-width: 400px;
+        width: 90%;
+    }
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-top-color: #22c55e;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">আমাদের সাথে যোগাযোগ করুন</h2>
+    <p class="text-center text-gray-600 mb-8">আপনার কোন প্রশ্ন বা সমস্যা থাকলে, আমাদের জানান।</p>
+    <p class="text-center text-gray-600 mb-8">1 gontar bitor amadar team apnar shata jugajug korba</p>
+
+    <form id="supportForm">
+      <div class="form-group mb-4">
+        <label for="subject" class="block text-sm">বিষয়</label>
+        <input type="text" id="subject" name="subject" placeholder="যেমন: পেমেন্ট সংক্রান্ত সমস্যা" required>
+      </div>
+
+      <div class="form-group mb-6">
+        <label for="message" class="block text-sm">আপনার বার্তা</label>
+        <textarea id="message" name="message" rows="5" placeholder="বিস্তারিতভাবে আপনার সমস্যাটি বর্ণনা করুন..." required></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn-primary">
+        <span id="btnText">টিকিট জমা দিন</span>
+        <span id="loadingSpinner" class="spinner hidden mx-auto"></span>
+      </button>
+    </form>
+    
+    <div id="responseMessage" class="hidden message-box"></div>
+  </div>
+
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3 class="text-2xl font-bold text-green-600 mb-2"><i class="fas fa-check-circle"></i> সফল!</h3>
+      <p class="text-gray-700">আপনার টিকিট সফলভাবে জমা দেওয়া হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('supportForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const responseMessage = document.getElementById('responseMessage');
+      const successModal = document.getElementById('successModal');
+      const closeBtn = document.querySelector('#successModal .close-btn');
+
+      // Check if user is authenticated
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // You might want to redirect to a login page or show a message
+        console.error("User not authenticated. Please log in.");
+        // Example: window.location.href = '/login.html';
+        return;
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // Reset UI state
+        responseMessage.classList.add('hidden');
+        responseMessage.classList.remove('message-success', 'message-error');
+        submitBtn.disabled = true;
+        btnText.classList.add('hidden');
+        loadingSpinner.classList.remove('hidden');
+
+        try {
+          const res = await fetch('/api/support/tickets', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ subject, message })
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            form.reset();
+            successModal.style.display = 'flex';
+          } else {
+            responseMessage.innerText = data.message || 'টিকিট জমা দিতে ব্যর্থ হয়েছে।';
+            responseMessage.classList.remove('hidden');
+            responseMessage.classList.add('message-error');
+          }
+        } catch (err) {
+          console.error('Error submitting ticket:', err);
+          responseMessage.innerText = 'একটি নেটওয়ার্ক ত্রুটি ঘটেছে। দয়া করে আবার চেষ্টা করুন।';
+          responseMessage.classList.remove('hidden');
+          responseMessage.classList.add('message-error');
+        } finally {
+          submitBtn.disabled = false;
+          btnText.classList.remove('hidden');
+          loadingSpinner.classList.add('hidden');
+        }
+      });
+      
+      // Close modal functionality
+      closeBtn.onclick = function() {
+        successModal.style.display = "none";
+      }
+
+      window.onclick = function(event) {
+        if (event.target == successModal) {
+          successModal.style.display = "none";
+        }
+      }
+    });
+  </script>
+</body>
+</html>

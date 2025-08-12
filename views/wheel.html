@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Lucky Wheel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      position: relative;
+    }
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      max-width: 400px;
+      width: 90%;
+    }
+    .title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .wheel-container {
+      position: relative;
+      display: inline-block;
+      width: 300px;
+      height: 300px;
+      margin-bottom: 1.5rem;
+    }
+    canvas {
+      border: 8px solid #374151;
+      border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .pointer {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid #ef4444; /* red-500 */
+      z-index: 10;
+    }
+    #spinBtn {
+      padding: 1rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(to right, #10b981, #059669); /* green-500 to green-600 */
+      border: none;
+      border-radius: 9999px; /* full rounded */
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    #spinBtn:hover:not(:disabled) {
+      background: linear-gradient(to right, #059669, #047857);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    #spinBtn:disabled {
+      background: #9ca3af; /* gray-400 */
+      cursor: not-allowed;
+    }
+    #result {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #374151;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-content h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .modal-content p {
+        color: #666;
+    }
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    /* Coming Soon Overlay */
+    .coming-soon-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent black */
+      backdrop-filter: blur(5px); /* Blurs the background content */
+      -webkit-backdrop-filter: blur(5px); /* For Safari */
+      z-index: 2000; /* Higher than other elements */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+    }
+    .coming-soon-text {
+      font-size: 3rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-content">
+    <h1 class="title">🎯 Lucky Wheel</h1>
+    <p id="spinStatus" class="font-medium text-gray-600">Spin as many times as you like!</p>
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <canvas id="wheelCanvas" width="300" height="300"></canvas>
+    </div>
+    <button id="spinBtn">Spin Now</button>
+    <p id="result" class="text-green-600"></p>
+  </div>
+
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalMessage"></p>
+    </div>
+  </div>
+
+  <!-- Comming Soon Overlay -->
+  <div class="coming-soon-overlay">
+    <h2 class="coming-soon-text">Cooming soon</h2>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const spinBtn = document.getElementById('spinBtn');
+    const resultDiv = document.getElementById('result');
+    const spinStatusDiv = document.getElementById('spinStatus');
+    const comingSoonOverlay = document.querySelector('.coming-soon-overlay');
+
+    // This section is now hidden by the overlay
+    const modal = document.getElementById("myModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMessage = document.getElementById("modalMessage");
+    const closeBtn = document.querySelector(".close-btn");
+
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    function showMessage(title, message) {
+        modalTitle.innerText = title;
+        modalMessage.innerText = message;
+        modal.style.display = "flex";
+    }
+
+    const rewards = [2, 5, 10, 0, 15, 0, 20, 0];
+    const colors = ['#f87171', '#fbbf24', '#34d399', '#9ca3af', '#60a5fa', '#9ca3af', '#a78bfa', '#9ca3af'];
+
+    function drawWheel() {
+      const totalRewards = rewards.length;
+      const arcSize = (2 * Math.PI) / totalRewards;
+      const radius = canvas.width / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+
+      for (let i = 0; i < totalRewards; i++) {
+        const startAngle = i * arcSize;
+        const endAngle = (i + 1) * arcSize;
+        
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.translate(radius, radius);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.fillText(rewards[i] ? `৳${rewards[i]}` : "Try Again", radius * 0.7, 0);
+        ctx.restore();
+      }
+    }
+
+    let currentAngle = 0;
+    
+    async function spinWheel() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        showMessage("Login Required", "Please log in to spin the wheel.");
+        return;
+      }
+      
+      spinBtn.disabled = true;
+      resultDiv.innerText = 'স্পিনিং হচ্ছে...';
+
+      try {
+        const rewardRes = await fetch('/api/wheel/reward', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+        });
+        const rewardData = await rewardRes.json();
+
+        if (!rewardRes.ok || !rewardData.success) {
+            showMessage("দুঃখিত!", rewardData.message || "স্পিন করার সময় সার্ভার ত্রুটি হয়েছে।");
+            spinBtn.disabled = false;
+            return;
+        }
+        
+        const prizeAmount = rewardData.prizeAmount;
+        let randomIndex = rewards.indexOf(prizeAmount);
+        if (randomIndex === -1 || prizeAmount === 0) {
+          const tryAgainIndices = rewards.map((val, idx) => val === 0 ? idx : -1).filter(idx => idx !== -1);
+          randomIndex = tryAgainIndices[Math.floor(Math.random() * tryAgainIndices.length)];
+        }
+
+        const anglePerSegment = 360 / rewards.length;
+        const stopAngle = 360 * 5 + (randomIndex * anglePerSegment) + (Math.random() * anglePerSegment - anglePerSegment / 2);
+        
+        currentAngle += stopAngle;
+        canvas.style.transform = `rotate(${currentAngle}deg)`;
+
+        setTimeout(() => {
+          if (prizeAmount > 0) {
+            resultDiv.innerText = `🎉 আপনি জিতেছেন ${prizeAmount}৳!`;
+            showMessage('অভিনন্দন!', `আপনি ${prizeAmount}৳ জিতেছেন!`);
+          } else {
+            resultDiv.innerText = `😢 কোনো পুরস্কার পাননি।`;
+            showMessage('দুঃখিত!', `এই স্পিনে কোনো পুরস্কার নেই।`);
+          }
+          spinBtn.disabled = false;
+        }, 4000); 
+
+      } catch (err) {
+        console.error("Spin error:", err);
+        showMessage('সার্ভার ত্রুটি', 'Spin করার সময় সার্ভার ত্রুটি হয়েছে। আবার চেষ্টা করুন।');
+        spinBtn.disabled = false;
+      }
+    }
+
+    spinBtn.addEventListener('click', spinWheel);
+
+    window.onload = () => {
+        drawWheel();
+    }
+  </script>
+</body>
+</html>

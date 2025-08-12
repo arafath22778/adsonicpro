@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Tailwind CSS for styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+        }
+        
+        .rank-badge {
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        /* Custom styles for the top 3 ranks */
+        .rank-1 .rank-badge {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .rank-2 .rank-badge {
+            background-color: #c0c0c0;
+        }
+        .rank-3 .rank-badge {
+            background-color: #cd7f32;
+        }
+
+        /* Default blue color for other ranks (matching header) */
+        .rank-4-plus .rank-badge {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Highlight the current user's row */
+        .highlight-user-row {
+            background-color: #e3f !important; /* Light blue background */
+            font-weight: bold;
+            border-left: 5px solid #007bff;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-poppins">
+
+    <div class="container mx-auto max-w-4xl p-6 md:p-10 my-10 bg-white rounded-3xl shadow-xl">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-yellow-500 mb-2 drop-shadow-md">
+                <i class="fas fa-trophy mr-2"></i> Leaderboard
+            </h1>
+        </div>
+        
+        <!-- Message area for loading/no data -->
+        <p id="message" class="text-center p-12 text-lg text-gray-500">Loading leaderboard...</p>
+        
+        <!-- Leaderboard table content -->
+        <div id="leaderboard-content" class="overflow-x-auto hidden">
+            <table class="min-w-full rounded-xl overflow-hidden shadow-lg">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="py-4 px-6 text-left text-sm font-semibold uppercase">Rank</th>
+                        <th class="py-4 px-6 text-left text-sm font-semibold uppercase">Name</th>
+                        <th class="py-4 px-6 text-left text-sm font-semibold uppercase">Total Earnings</th>
+                        <th class="py-4 px-6 text-left text-sm font-semibold uppercase">Total Deposits</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Leaderboard data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for errors and messages -->
+    <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+            <p id="modal-body" class="mb-6"></p>
+            <button id="modal-close" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to show a custom modal instead of alert()
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').textContent = message;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        document.getElementById('modal-close').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showModal('Authentication Error', 'Please log in to view the leaderboard.');
+                return;
+            }
+
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            const messageElement = document.getElementById('message');
+            const leaderboardContent = document.getElementById('leaderboard-content');
+
+            messageElement.textContent = 'Loading leaderboard...';
+            messageElement.classList.remove('hidden');
+            
+            try {
+                // NOTE: The backend API at '/api/leaderboard' must return an object with two properties:
+                // 1. 'leaderboard': An array of the top 20 users.
+                // 2. 'currentUser': An object with the current user's details and their global rank.
+                const response = await fetch('/api/leaderboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch leaderboard data');
+                }
+
+                const { leaderboard, currentUser } = await response.json();
+
+                if (Array.isArray(leaderboard) && leaderboard.length > 0) {
+                    messageElement.classList.add('hidden');
+                    leaderboardContent.classList.remove('hidden');
+                    leaderboardBody.innerHTML = ''; // Clear old data
+
+                    leaderboard.forEach((user, index) => {
+                        const rank = index + 1;
+                        const row = document.createElement('tr');
+                        row.classList.add(
+                            `rank-${rank}`, 
+                            'hover:bg-gray-50', 
+                            'transition-colors', 
+                            'duration-200'
+                        );
+                        
+                        // Add class for custom rank badge color
+                        if (rank > 3) {
+                           row.classList.add('rank-4-plus');
+                        }
+
+                        // Highlight the current user's row if they are in the top 20
+                        if (currentUser && user._id === currentUser._id) {
+                            row.classList.add('highlight-user-row');
+                        }
+                        
+                        row.innerHTML = `
+                            <td class="py-3 px-6 whitespace-nowrap">
+                                <span class="rank-badge inline-block font-bold text-white px-3 py-1 rounded-full shadow-md">
+                                    ${rank}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6 font-medium whitespace-nowrap">${user.name}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">৳${user.totalEarnings.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">৳${user.totalDeposits.toFixed(2)}</td>
+                        `;
+                        leaderboardBody.appendChild(row);
+                    });
+                    
+                    // Add a special row for the current user if they are outside the top 20
+                    if (currentUser && currentUser.rank > 20) {
+                        const userRow = document.createElement('tr');
+                        userRow.classList.add('highlight-user-row', 'hover:bg-gray-50', 'transition-colors', 'duration-200');
+                        userRow.innerHTML = `
+                            <td class="py-3 px-6 whitespace-nowrap">
+                                <span class="rank-badge inline-block font-bold px-3 py-1 rounded-full shadow-md rank-4-plus">
+                                    ${currentUser.rank}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6 font-medium whitespace-nowrap">${currentUser.name}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">৳${currentUser.totalEarnings.toFixed(2)}</td>
+                            <td class="py-3 px-6 whitespace-nowrap">৳${currentUser.totalDeposits.toFixed(2)}</td>
+                        `;
+                        leaderboardBody.appendChild(userRow);
+                    }
+                    
+                } else {
+                    messageElement.textContent = 'No leaderboard data found.';
+                    messageElement.classList.add('no-data-message');
+                }
+
+            } catch (err) {
+                console.error('Error fetching leaderboard:', err);
+                messageElement.textContent = 'An error occurred while loading data. Please try again.';
+                showModal('Server Error', 'Could not load data. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
+

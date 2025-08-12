@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Expiry Countdown</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+    .floating-contact-btn {
+    position: fixed; /* বাটনটিকে স্ক্রিনে স্থির রাখার জন্য */
+    top: 1rem; /* উপরের কিনারা থেকে মাত্র 1rem নিচে */
+    right: 1rem; /* ডান কিনারা থেকে মাত্র 1rem দূরে */
+    width: 60px;
+    height: 60px;
+    background-color: #0088CC; /* Telegram's brand color */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px #0088CC, 0 0 20px #0088CC, 0 0 30px #0088CC, 0 0 40px #0088CC;
+    transition: all 0.3s ease-in-out;
+    opacity: 1; /* ডিফল্টরূপে দৃশ্যমান */
+    pointer-events: auto;
+    z-index: 1000;
+  }
+  
+  .floating-contact-btn.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .floating-contact-btn:hover {
+    box-shadow: 0 0 15px #0088CC, 0 0 25px #0088CC, 0 0 35px #0088CC, 0 0 45px #0088CC;
+    transform: scale(1.1);
+  }
+
+  /* ছোট স্ক্রিনের জন্য রেসপন্সিভ স্টাইল */
+  @media (max-width: 768px) {
+    .floating-contact-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1.25rem;
+      top: 0.5rem; /* ছোট স্ক্রিনে উপরের কিনারার আরও কাছে */
+      right: 0.5rem; /* ছোট স্ক্রিনে ডান কিনারার আরও কাছে */
+    }
+  }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .countdown-container {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        .countdown-item {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            flex: 1;
+            margin: 0.5rem;
+        }
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            line-height: 1;
+        }
+        .countdown-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+        #countdown-message {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #10b981;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+  <a href="https://t.me/your_telegram_username" target="_blank" class="floating-contact-btn" title="Telegram-এ আমাদের সাথে যোগাযোগ করুন">
+  <i class="fab fa-telegram-plane"></i>
+</a>  
+    <div class="countdown-container">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">এই পেজ আর কত দিন চলবে?</h2>
+        
+        <div id="countdown" class="flex flex-wrap justify-center items-center mt-8">
+            <!-- Countdown timer will be displayed here -->
+        </div>
+
+        <div id="countdown-message" class="hidden">
+            সময় শেষ!
+        </div>
+    </div>
+
+    <script>
+        // Set the end date to 3 years from today
+        const now = new Date();
+        const endDate = new Date(now.getFullYear() + 3, now.getMonth(), now.getDate());
+
+        const countdownDiv = document.getElementById('countdown');
+        const countdownMessageDiv = document.getElementById('countdown-message');
+
+        function updateCountdown() {
+            const currentTime = new Date();
+            const timeDifference = endDate.getTime() - currentTime.getTime();
+
+            // If the countdown is over, display a message
+            if (timeDifference <= 0) {
+                clearInterval(countdownInterval);
+                countdownDiv.classList.add('hidden');
+                countdownMessageDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Calculate remaining time in days, hours, minutes, seconds
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            // Update the display with a responsive layout
+            countdownDiv.innerHTML = `
+                <div class="countdown-item">
+                    <div class="countdown-value">${days}</div>
+                    <div class="countdown-label">দিন</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value">${hours}</div>
+                    <div class="countdown-label">ঘন্টা</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value">${minutes}</div>
+                    <div class="countdown-label">মিনিট</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value">${seconds}</div>
+                    <div class="countdown-label">সেকেন্ড</div>
+                </div>
+            `;
+        }
+
+        // Run the function once immediately to avoid a 1-second delay
+        updateCountdown();
+
+        // Update the countdown every second
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        document.addEventListener('DOMContentLoaded', () => {
+    const telegramBtn = document.querySelector('.floating-contact-btn');
+    let scrollTimeout;
+
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      telegramBtn.classList.add('hide');
+
+      scrollTimeout = setTimeout(() => {
+        telegramBtn.classList.remove('hide');
+      }, 350);
+    });
+  });
+    </script>
+</body>
+</html>
+

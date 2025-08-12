@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Team</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #91d3ff, #c0e7ff);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 20px;
+    }
+    .referral-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .referral-card {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.3s ease;
+    }
+    .referral-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .user-balance {
+      font-size: 14px;
+      color: #555;
+    }
+    .no-user {
+      text-align: center;
+      color: #777;
+      font-size: 16px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h2><i class="fas fa-users"></i> My Team</h2>
+  <div class="referral-list" id="referralList">
+    <div class="no-user">Loading...</div>
+  </div>
+
+  <script>
+    async function loadTeam() {
+      const token = localStorage.getItem('token');
+      if (!token) return window.location.href = "/login";
+
+      try {
+        const res = await fetch('/api/my-referrals', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        const list = document.getElementById("referralList");
+        list.innerHTML = "";
+
+        if (res.ok) {
+          const users = await res.json();
+
+          if (users.length === 0) {
+            list.innerHTML = `<div class="no-user">No users have registered or deposited using your referral link.</div>`;
+            return;
+          }
+
+          users.forEach(user => {
+            const div = document.createElement('div');
+            div.className = 'referral-card';
+            div.innerHTML = `
+              <div class="user-info">
+                <div class="user-name">${user.name}</div>
+                <div class="user-balance">Balance: ৳${user.balance}</div>
+              </div>
+              <i class="fa-solid fa-user"></i>
+            `;
+            list.appendChild(div);
+          });
+        } else {
+          list.innerHTML = `<div class="no-user">Failed to load data.</div>`;
+        }
+      } catch (err) {
+        console.error("Error loading referrals:", err);
+        document.getElementById("referralList").innerHTML = `<div class="no-user">Server Error!</div>`;
+      }
+    }
+
+    window.onload = loadTeam;
+  </script>
+</body>
+</html>
