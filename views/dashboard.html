@@ -1,453 +1,574 @@
 <!DOCTYPE html>
 <html lang="bn">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <title>Panasonic ads Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: linear-gradient(to bottom right, #91d3ff, #c0e7ff);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-
-      #click {
-        text-align: center;
-        margin-left: 85px;
-        border-radius: 7px;
-        background-color: red;
-      }
-      #banner-container {
-        position: relative;
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px; /* ব্যানার এবং কন্টেন্টের মধ্যে দূরত্ব */
-      }
-      #banner-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        position: absolute;
-        top: 0;
-        left: 0;
-        filter: blur(5px); /* শুধু ছবি ঝাপসা হবে */
-        transition: all 0.3s ease;
-      }
-      #banner-text {
-        position: relative;
-        color: #0088cc;
-        font-size: 2em;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        z-index: 1; /* টেক্সট ছবির উপরে থাকবে */
-        transition: all 0.3s ease;
-      }
-
-      #fullscreen-image-container {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-        z-index: 1001;
-        cursor: pointer;
-        justify-content: center;
-        align-items: center;
-      }
-      #fullscreen-image-container img {
-        max-width: 90%;
-        max-height: 90%;
-      }
-      .content {
-        flex: 1;
-        overflow-y: auto;
-        padding-bottom: 70px;
-      }
-      .top-box {
-        background: #e1f3ff;
-        padding: 20px;
-        border-radius: 10px;
-        margin: 15px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-      .top-box img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-      .top-box h3 {
-        margin: 10px 0 5px;
-      }
-      .top-box p {
-        font-size: 18px;
-        font-weight: bold;
-        margin: 0;
-      }
-
-      .ref-link {
-        background: white;
-        margin: 10px 15px;
-        padding: 10px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-      }
-      .ref-link input {
-        border: none;
-        background: transparent;
-        width: 100%;
-        outline: none;
-        font-size: 14px;
-      }
-      .ref-link i {
-        cursor: pointer;
-        color: #6200ea;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 15px;
-      }
-      .grid button {
-        background: black;
-        color: white;
-        font-size: 15px;
-        padding: 20px 10px;
-        border: none;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        transition: 0.3s;
-      }
-      .grid button:hover {
-        background: #333;
-      }
-      .grid i {
-        font-size: 24px;
-      }
-
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #000;
-        display: flex;
-        justify-content: space-around;
-        padding: 10px 0;
-        color: white;
-      }
-      .bottom-nav i {
-        font-size: 18px;
-      }
-      .bottom-nav span {
-        font-size: 12px;
-      }
-      .bottom-nav div {
-        text-align: center;
-        cursor: pointer;
-      }
-
-      #referInfoModal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      }
-      #referInfoModal .modal-content {
-        background: #fff;
-        max-width: 90%;
-        margin: 10% auto;
-        padding: 20px;
-        border-radius: 8px;
-        position: relative;
-      }
-
-      .floating-contact-btn {
-        position: fixed; /* বাটনটিকে স্ক্রিনে স্থির রাখার জন্য */
-        top: 1rem; /* উপরের কিনারা থেকে মাত্র 1rem নিচে */
-        right: 1rem; /* ডান কিনারা থেকে মাত্র 1rem দূরে */
-        width: 60px;
-        height: 60px;
-        background-color: #0088cc; /* Telegram's brand color */
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 0 10px #0088cc, 0 0 20px #0088cc, 0 0 30px #0088cc,
-          0 0 40px #0088cc;
-        transition: all 0.3s ease-in-out;
-        opacity: 1; /* ডিফল্টরূপে দৃশ্যমান */
-        pointer-events: auto;
-        z-index: 1000;
-      }
-
-      .floating-contact-btn.hide {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .floating-contact-btn:hover {
-        box-shadow: 0 0 15px #0088cc, 0 0 25px #0088cc, 0 0 35px #0088cc,
-          0 0 45px #0088cc;
-        transform: scale(1.1);
-      }
-
-      /* ছোট স্ক্রিনের জন্য রেসপন্সিভ স্টাইল */
-      @media (max-width: 768px) {
-        .floating-contact-btn {
-          width: 50px;
-          height: 50px;
-          font-size: 1.25rem;
-          top: 0.5rem; /* ছোট স্ক্রিনে উপরের কিনারার আরও কাছে */
-          right: 0.5rem; /* ছোট স্ক্রিনে ডান কিনারার আরও কাছে */
+        /* Global & Base Styles */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 70px;
+            /* Space for the bottom navigation bar */
         }
-      }
+
+        .main-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        /* Floating Contact Button */
+        .floating-contact-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            background-color: #0088cc;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px #0088cc, 0 0 20px #0088cc, 0 0 30px #0088cc;
+            transition: all 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .floating-contact-btn:hover {
+            box-shadow: 0 0 15px #0088cc, 0 0 25px #0088cc, 0 0 35px #0088cc, 0 0 45px #0088cc;
+            transform: scale(1.1);
+        }
+
+        .floating-contact-btn.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Banner Section */
+        #banner-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            margin: 0 auto 20px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #banner-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            filter: blur(8px) brightness(0.6);
+            transition: all 0.5s ease;
+        }
+
+        #banner-text {
+            position: relative;
+            color: #fff;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+
+        #banner-text i {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #ffcc00;
+        }
+
+        /* Fullscreen Image Modal */
+        #fullscreen-image-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #fullscreen-image-container img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* User Info Section */
+        .top-box {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 0 0 20px 0;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-box img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #007bff;
+        }
+
+        .top-box h3 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .top-box p {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0;
+            color: #555;
+        }
+
+        /* Referral Link Section */
+        .ref-link {
+            background: #ffffff;
+            margin: 0 0 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ref-link label {
+            white-space: nowrap;
+            font-weight: bold;
+            color: #0056b3;
+            flex-shrink: 0;
+        }
+
+        .ref-link input {
+            border: none;
+            background: #f0f8ff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .ref-link .action-icons i {
+            cursor: pointer;
+            color: #007bff;
+            font-size: 1.2em;
+            margin-left: 5px;
+            transition: color 0.3s;
+        }
+
+        .ref-link .action-icons i:hover {
+            color: #0056b3;
+        }
+
+        /* Main Grid Buttons (Responsive) */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .grid button {
+            background: #2c3e50;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 20px 10px;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid button:hover {
+            background: #34495e;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid i {
+            font-size: 28px;
+            color: #3498db;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            color: #888;
+            z-index: 999;
+        }
+
+        .bottom-nav div {
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+
+        .bottom-nav div i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .bottom-nav div:hover,
+        .bottom-nav div.active {
+            color: #007bff;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Toast Message (Responsive & Improved) */
+        #toast {
+            position: fixed;
+            bottom: 80px;
+            /* Positioned above the bottom-nav */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+            white-space: nowrap;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+
+        #toast.show {
+            display: block;
+            opacity: 1;
+        }
     </style>
-  </head>
-  <body>
-    <!-- benner add -->
-    <div id="banner-container">
-      <img
-        src="https://i.ibb.co/HfvbVbVb/https-page2images-b-cdn-net-ccimages-0d-10-Lkt9-QGv-K1g3-Fous-E.png"
-        alt="Your Benefit Banner"
-      />
-      <h1 id="banner-text">
-        আপনার লাভ কী? <br />
-        <span id="click"> Click </span>
-      </h1>
-    </div>
+</head>
 
-    <div id="fullscreen-image-container">
-      <img
-        src="https://i.ibb.co/h0RX5S5/Screenshot-2025-08-11-131934.png"
-        alt="Clear Fullscreen Image"
-      />
-    </div>
+<body>
 
-    <a
-      href="https://t.me/+EirMes039t1iNDhl"
-      target="_blank"
-      class="floating-contact-btn"
-      title="Telegram-এ আমাদের সাথে যোগাযোগ করুন"
-    >
-      <i class="fab fa-telegram-plane"></i>
+    <!-- Floating Contact Button -->
+    <a href="https://t.me/+EirMes039t1iNDhl" target="_blank" class="floating-contact-btn" title="Telegram-এ আমাদের সাথে যোগাযোগ করুন">
+        <i class="fab fa-telegram-plane"></i>
     </a>
-    <!-- রেফার পপআপ -->
-    <div id="referInfoModal">
-      <div class="modal-content">
-        <h3 style="margin-top: 0">রেফার লিংক কিভাবে কাজ করে?</h3>
-        <p>
-          আপনার রেফার লিংক শেয়ার করুন। কেউ যদি আপনার লিংক ব্যবহার করে অ্যাকাউন্ট
-          খুলে <strong>সর্বনিম্ন ৩০০ টাকা</strong> সফলভাবে ডিপোজিট করে , তাহলে
-          আপনি পাবেন <strong>২০ টাকা</strong> কমিশন।এর জন্য আপনার কোনো প্যাকেজ কিনা না থাকলেও হবে!!!
-        </p>
-      </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Improved Banner Section -->
+        <div id="banner-container">
+            <img src="https://i.ibb.co/HfvbVbVb/https-page2images-b-cdn-net-ccimages-0d-10-Lkt9-QGv-K1g3-Fous-E.png" alt="Your Benefit Banner" />
+            <h1 id="banner-text">
+                আপনার লাভ কী?
+                <i class="fas fa-angle-double-down"></i>
+            </h1>
+        </div>
+
+        <!-- Fullscreen Image Modal -->
+        <div id="fullscreen-image-container">
+            <img src="https://i.ibb.co/h0RX5S5/Screenshot-2025-08-11-131934.png" alt="Clear Fullscreen Image" />
+        </div>
+
+        <!-- User Info Section -->
+        <div class="top-box">
+            <img src="https://i.ibb.co.com/xKvc1Thh/images-5.jpg" alt="profile" />
+            <h3 id="userName">--</h3>
+            <p>Available: <span id="balance">--</span> ৳</p>
+        </div>
+
+        <!-- Referral Link Section -->
+        <div class="ref-link">
+            <label>আপনার রেফার লিংক:</label>
+            <input type="text" id="referCode" readonly />
+            <div class="action-icons">
+                <i class="fas fa-info-circle" id="infoIcon" title="রেফার তথ্য"></i>
+                <i class="fa-regular fa-copy" onclick="copyReferral()"></i>
+            </div>
+        </div>
+
+        <!-- Main Button Grid (Responsive) -->
+        <div class="grid">
+            <button onclick="navigate('deposit')">
+                <i class="fa-solid fa-download"></i>Deposit
+            </button>
+            <button onclick="navigate('withdraw')">
+                <i class="fa-solid fa-upload"></i>Withdraw
+            </button>
+            <button onclick="navigate('deposit-history')">
+                <i class="fa-solid fa-file-invoice-dollar"></i>Deposit History
+            </button>
+            <button onclick="navigate('withdraw-history')">
+                <i class="fa-solid fa-receipt"></i>Withdraw History
+            </button>
+            <button onclick="navigate('package')">
+                <i class="fa-solid fa-crown"></i>Package
+            </button>
+            <button onclick="navigate('tasks')">
+                <i class="fa-solid fa-laptop-code"></i>Tasks
+            </button>
+            <button onclick="navigate('bonus')">
+                <i class="fa-solid fa-gift"></i>Bonus Code
+            </button>
+            <button onclick="navigate('team')">
+                <i class="fa-solid fa-users"></i>My Team
+            </button>
+            <button onclick="navigate('profile')">
+                <i class="fa-solid fa-user"></i>Profile
+            </button>
+            <button onclick="navigate('notifications')">
+                <i class="fas fa-bell"></i>Notification
+            </button>
+            <button onclick="navigate('leaderboard')">
+                <i class="fas fa-trophy"></i>Leaderboard
+            </button>
+            <button onclick="navigate('wheel')">
+                <i class="fa-solid fa-dharmachakra"></i>Lucky Wheel
+            </button>
+            <button onclick="navigate('count')">
+                <i class="fas fa-clock"></i>Page Lifetime
+            </button>
+            <button onclick="navigate('reve')">
+                <i class="fas fa-money-bill-trend-up"></i>Revinews
+            </button>
+            <button onclick="navigate('app')">
+                <i class="fas fa-cloud-arrow-down"></i>App download
+            </button>
+            <button onclick="window.location.href='support.html'">
+                <i class="fas fa-headset"></i>সাপোর্ট
+            </button>
+            <button onclick="navigate('commission')">
+                <i class="fa-solid fa-coins"></i>Commission
+            </button>
+            <button onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>Logout
+            </button>
+        </div>
     </div>
 
-    <div class="content">
-      <div class="top-box">
-        <img src="https://i.ibb.co.com/xKvc1Thh/images-5.jpg" alt="profile" />
-        <h3 id="userName"></h3>
-        <p>Available: <span id="balance">--</span></p>
-      </div>
-
-      <div class="ref-link">
-        <label style="white-space: nowrap">আপনার রেফার লিংক:</label>
-        <input type="text" id="referCode" readonly />
-        <i class="fas fa-info-circle" id="infoIcon" title="রেফার তথ্য"></i>
-        <i class="fa-regular fa-copy" onclick="copyReferral()"></i>
-      </div>
-
-      <div class="grid">
-        <button onclick="navigate('deposit')">
-          <i class="fa-solid fa-download"></i>Deposit
-        </button>
-        <button onclick="navigate('withdraw')">
-          <i class="fa-solid fa-upload"></i>Withdraw
-        </button>
-        <button onclick="navigate('deposit-history')">
-          <i class="fa-solid fa-file-invoice-dollar"></i>Deposit History
-        </button>
-        <button onclick="navigate('withdraw-history')">
-          <i class="fa-solid fa-receipt"></i>Withdraw History
-        </button>
-        <button onclick="navigate('package')">
-          <i class="fa-solid fa-crown"></i>Package
-        </button>
-        <button onclick="navigate('tasks')">
-          <i class="fa-solid fa-laptop-code"></i>Tasks
-        </button>
-        <button onclick="navigate('bonus')">
-          <i class="fa-solid fa-gift"></i>Bonus Code
-        </button>
-        <button onclick="navigate('team')">
-          <i class="fa-solid fa-users"></i>My Team
-        </button>
-        <button onclick="navigate('profile')">
-          <i class="fa-solid fa-user"></i>Profile
-        </button>
-        <button onclick="navigate('notifications')">
-          <i class="fas fa-bell"></i> Notification
-        </button>
-        <button onclick="navigate('leaderboard')">
-          <i class="fas fa-trophy"></i> Leaderboard
-        </button>
-        <button onclick="navigate('wheel')">
-          <i class="fa-solid fa-dharmachakra"></i> Lucky Wheel
-        </button>
-        <button onclick="navigate('count')">
-          <i class="fas fa-clock"></i> Page Lifetime
-        </button>
-        <button onclick="navigate('reve')">
-          <i class="fas fa-money-bill-trend-up"></i> Revinews
-        </button>
-        <button onclick="navigate('app')">
-          <i class="fas fa-cloud-arrow-down"></i> App download
-        </button>
-        <button
-          onclick="window.location.href='support.html'"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300"
-        >
-          <i class="fas fa-headset mr-2"></i> সাপোর্ট
-        </button>
-        <button onclick="navigate('commission')">
-          <i class="fa-solid fa-coins"></i> Commission
-        </button>
-        <button onclick="logout()">
-          <i class="fa-solid fa-right-from-bracket"></i>Logout
-        </button>
-      </div>
-    </div>
-
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-      <div onclick="navigate('package')">
-        <i class="fa-solid fa-box"></i><br /><span>Package</span>
-      </div>
-      <div onclick="navigate('dashboard')">
-        <i class="fa-solid fa-house"></i><br /><span>Home</span>
-      </div>
-      <div onclick="navigate('tasks')">
-        <i class="fa-solid fa-list-check"></i><br /><span>Task</span>
-      </div>
+        <div onclick="navigate('package')">
+            <i class="fa-solid fa-box"></i><span>Package</span>
+        </div>
+        <div onclick="navigate('dashboard')" class="active">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </div>
+        <div onclick="navigate('tasks')">
+            <i class="fa-solid fa-list-check"></i><span>Task</span>
+        </div>
     </div>
+
+    <!-- Referral Info Modal -->
+    <div id="referInfoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 style="margin-top: 0">রেফার লিংক কিভাবে কাজ করে?</h3>
+            <p>
+                আপনার রেফার লিংক শেয়ার করুন। কেউ যদি আপনার লিংক ব্যবহার করে অ্যাকাউন্ট খুলে
+                <strong>সর্বনিম্ন ৩০০ টাকা</strong> সফলভাবে ডিপোজিট করে , তাহলে আপনি পাবেন
+                <strong>২০ টাকা</strong> কমিশন। এর জন্য আপনার কোনো প্যাকেজ কেনা না থাকলেও হবে!
+            </p>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast"></div>
 
     <script>
-      async function loadUserInfo() {
-        const token = localStorage.getItem("token");
-        if (!token) return (window.location.href = "/login");
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
-        try {
-          const res = await fetch("/api/user-info", {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          });
-
-          if (res.ok) {
-            const data = await res.json();
-            document.getElementById("userName").innerText = data.name;
-            document.getElementById("balance").innerText = data.balance + " ৳";
-
-            if (data.referCode) {
-              document.getElementById(
-                "referCode"
-              ).value = `${window.location.origin}/?ref=${data.referCode}`;
+        async function loadUserInfo() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "/login.html";
+                return;
             }
-          } else {
-            window.location.href = "/login";
-          }
-        } catch (e) {
-          console.error("Error fetching user info:", e);
-          window.location.href = "/login";
+
+            try {
+                const res = await fetch("/api/user-info", {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById("userName").innerText = data.name;
+                    document.getElementById("balance").innerText = data.balance;
+
+                    if (data.referCode) {
+                        document.getElementById("referCode").value = `${window.location.origin}/?ref=${data.referCode}`;
+                    }
+                } else {
+                    window.location.href = "/login.html";
+                }
+            } catch (e) {
+                console.error("Error fetching user info:", e);
+                window.location.href = "/login.html";
+            }
         }
-      }
 
-      function navigate(page) {
-        window.location.href = `/${page}.html`;
-      }
-
-      function logout() {
-        localStorage.removeItem("token");
-        window.location.href = "/index.html";
-      }
-
-      function copyReferral() {
-        const refInput = document.getElementById("referCode");
-        refInput.select();
-        document.execCommand("copy");
-        alert("Referral link copied!");
-      }
-
-      window.onload = loadUserInfo;
-
-      // Modal popup logic
-      const infoIcon = document.getElementById("infoIcon");
-      const modal = document.getElementById("referInfoModal");
-      infoIcon.addEventListener("click", () => {
-        modal.style.display = "block";
-      });
-      window.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          modal.style.display = "none";
+        function navigate(page) {
+            window.location.href = `/${page}.html`;
         }
-      });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const telegramBtn = document.querySelector(".floating-contact-btn");
-        let scrollTimeout;
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "/index.html";
+        }
 
-        window.addEventListener("scroll", () => {
-          clearTimeout(scrollTimeout);
-          telegramBtn.classList.add("hide");
+        function copyReferral() {
+            const refInput = document.getElementById("referCode");
+            refInput.select();
+            document.execCommand("copy");
+            showToast("রেফারেল লিংক কপি করা হয়েছে!");
+        }
 
-          scrollTimeout = setTimeout(() => {
-            telegramBtn.classList.remove("hide");
-          }, 350);
+        const infoIcon = document.getElementById("infoIcon");
+        const modal = document.getElementById("referInfoModal");
+        const closeModal = document.querySelector('.close-modal');
+
+        infoIcon.addEventListener("click", () => {
+            modal.style.display = "flex";
         });
-      });
-      const bannerContainer = document.getElementById("banner-container");
-      const fullscreenContainer = document.getElementById(
-        "fullscreen-image-container"
-      );
 
-      bannerContainer.addEventListener("click", () => {
-        fullscreenContainer.style.display = "flex";
-      });
+        closeModal.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
 
-      fullscreenContainer.addEventListener("click", () => {
-        fullscreenContainer.style.display = "none";
-      });
+        window.addEventListener("click", function(e) {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        const bannerContainer = document.getElementById("banner-container");
+        const fullscreenContainer = document.getElementById("fullscreen-image-container");
+
+        bannerContainer.addEventListener("click", () => {
+            fullscreenContainer.style.display = "flex";
+        });
+
+        fullscreenContainer.addEventListener("click", () => {
+            fullscreenContainer.style.display = "none";
+        });
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const telegramBtn = document.querySelector(".floating-contact-btn");
+            let scrollTimeout;
+
+            window.addEventListener("scroll", () => {
+                clearTimeout(scrollTimeout);
+                telegramBtn.classList.add("hide");
+
+                scrollTimeout = setTimeout(() => {
+                    telegramBtn.classList.remove("hide");
+                }, 350);
+            });
+        });
+
+        window.onload = loadUserInfo;
     </script>
-  </body>
+</body>
+
 </html>
