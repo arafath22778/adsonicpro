@@ -1,167 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <title>HTML</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .package-table {
-      width: 95%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    
-    .package-table th,
-    .package-table td {
-      text-align: center;
-      padding: 12px 8px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .package-table th {
-      background-color: #007bff;
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    
-    .package-table tr:last-child td {
-      border-bottom: none;
-    }
-    
-    .package-table tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    
-    .package-table .package-name {
-      font-weight: bold;
-    }
-    
-    /* @media (max-width: 600px) {
-    .package-table, .package-table tbody, .package-table tr, .package-table td {
-      display: block;
-      width: 100%;
-    }
-    .package-table thead {
-      display: none;
-    }
-    .package-table tr {
-      margin-bottom: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-    }
-    .package-table td {
-      text-align: right;
-      padding-left: 50%;
-      position: relative;
-    }
-    .package-table td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 10px;
-      font-weight: bold;
-      text-align: left;
-    }
-  } */
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>প্যাকেজের লাভ</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Basic styling for the card, without interactive effects */
+        .package-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
 
-<body>
-  <table class="package-table">
-    <thead>
-      <tr>
-        <th>Package Price</th>
-        <th>Daily Income</th>
-        <th>Monthly Ads Income</th>
-        <th>Bonus Income</th>
-        <th>Validity</th>
-        <th>Total Profit</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td data-label="Package Price">৳300</td>
-        <td data-label="Daily Income">৳20-25</td>
-        <td data-label="Monthly Income">৳450+</td>
-        <td data-label="Bonus Income">৳8 - ৳15</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳600+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳500</td>
-        <td data-label="Daily Income">৳15</td>
-        <td data-label="Monthly Income">৳450</td>
-        <td data-label="Bonus Income">৳5 - ৳10</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳450+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳1000</td>
-        <td data-label="Daily Income">৳35</td>
-        <td data-label="Monthly Income">৳1050</td>
-        <td data-label="Bonus Income">৳10 - ৳20</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳1050+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳5000</td>
-        <td data-label="Daily Income">৳180</td>
-        <td data-label="Monthly Income">৳5400</td>
-        <td data-label="Bonus Income">৳50 - ৳100</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳5400+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳10000</td>
-        <td data-label="Daily Income">৳370</td>
-        <td data-label="Monthly Income">৳11100</td>
-        <td data-label="Bonus Income">৳100 - ৳200</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳11100+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳20000</td>
-        <td data-label="Daily Income">৳750</td>
-        <td data-label="Monthly Income">৳22500</td>
-        <td data-label="Bonus Income">৳200 - ৳400</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳22500+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳40000</td>
-        <td data-label="Daily Income">৳1500</td>
-        <td data-label="Monthly Income">৳45000</td>
-        <td data-label="Bonus Income">৳400 - ৳800</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳45000+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳50000</td>
-        <td data-label="Daily Income">৳1800</td>
-        <td data-label="Monthly Income">৳54000</td>
-        <td data-label="Bonus Income">৳500 - ৳1000</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳54000+</td>
-      </tr>
-      <tr>
-        <td data-label="Package Price">৳100000</td>
-        <td data-label="Daily Income">৳1800</td>
-        <td data-label="Monthly Income">৳54000</td>
-        <td data-label="Bonus Income">৳500 - ৳1000</td>
-        <td data-label="Validity">30 Days</td>
-        <td data-label="Total Profit">৳54000+</td>
-      </tr>
-    </tbody>
-  </table>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8">প্যাকেজের বিস্তারিত</h1>
+
+        <div id="package-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Package cards will be dynamically generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Combined package data for a cleaner, more efficient render
+        const allPackages = [
+            { name: "Basic", price: 300, ads: '1', daily: '20-25', monthly: '700+', bonus: '10-20', validity: '30 Days', profit: '900+' },
+            { name: "Standard", price: 550, ads: '2', daily: '40-45', monthly: '1200+', bonus: '10-20', validity: '30 Days', profit: '1700+' },
+            { name: "Pro", price: 1700, ads: '5', daily: '100-110', monthly: '3300+', bonus: '10-20', validity: '30 Days', profit: '3800+' },
+            { name: "Elite", price: 2000, ads: '7', daily: '140-150', monthly: '4500+', bonus: '10-20', validity: '30 Days', profit: '5000+' },
+            { name: "Business", price: 5000, ads: '17', daily: '340-350', monthly: '6000+', bonus: '10-20', validity: '30 Days', profit: '6500+' },
+            { name: "Premium", price: 10000, ads: '35', daily: '700-710', monthly: '24500+', bonus: '10-20', validity: '30 Days', profit: '24600+' },
+            { name: "Ultimate", price: 20000, ads: '70', daily: '1400-1500', monthly: '42000+', bonus: '10-20', validity: '30 Days', profit: '42500+' },
+            { name: "Enterprise", price: 50000, ads: '170', daily: '3400-3500', monthly: '100000+', bonus: '10-20', validity: '30 Days', profit: '100500+' },
+            { name: "Mega", price: 75000, ads: '280', daily: '5600-5700', monthly: '160000+', bonus: '10-20', validity: '30 Days', profit: '160500+' },
+            { name: "VIP", price: 100000, ads: '500', daily: '10000-11000', monthly: '300000+', bonus: '10-20', validity: '30 Days', profit: '300500+' }
+        ];
+
+        // Function to load and display package details
+        function loadPackages() {
+            const container = document.getElementById('package-list');
+            container.innerHTML = ''; // Clear existing content
+
+            allPackages.forEach(pkg => {
+                const div = document.createElement('div');
+                div.className = 'package-card';
+                div.innerHTML = `
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-blue-600">${pkg.name}</h2>
+                        <span class="text-xl font-bold text-gray-800">৳${pkg.price}</span>
+                    </div>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-bullhorn text-green-500 mr-2"></i>প্রতিদিন অ্যাড: <span class="font-semibold text-gray-800 ml-1">${pkg.ads}টি</span></li>
+                        <li class="flex items-center"><i class="fas fa-sack-dollar text-green-500 mr-2"></i>দৈনিক আয়: <span class="font-semibold text-gray-800 ml-1">৳${pkg.daily}</span></li>
+                        <li class="flex items-center"><i class="fas fa-calendar-alt text-green-500 mr-2"></i>মাসিক আয়: <span class="font-semibold text-gray-800 ml-1">৳${pkg.monthly}</span></li>
+                        <li class="flex items-center"><i class="fas fa-gift text-green-500 mr-2"></i>বোনাস আয়: <span class="font-semibold text-gray-800 ml-1">৳${pkg.bonus}</span></li>
+                        <li class="flex items-center"><i class="fas fa-clock text-green-500 mr-2"></i>মেয়াদ: <span class="font-semibold text-gray-800 ml-1">${pkg.validity}</span></li>
+                        <li class="flex items-center"><i class="fas fa-chart-line text-green-500 mr-2"></i>মোট লাভ: <span class="font-semibold text-gray-800 ml-1">৳${pkg.profit}</span></li>
+                    </ul>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPackages();
+        });
+    </script>
 </body>
 
 </html>
