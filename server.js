@@ -11,6 +11,7 @@ const cron = require("node-cron");
 const nodemailer = require('nodemailer');
 const { v2: cloudinary } = require('cloudinary');
 const { Readable } = require('stream');
+const crypto = require('crypto'); // নতুন: টোকেন তৈরির জন্য crypto মডিউল
 
 // dotenv প্যাকেজ ইম্পোর্ট ও কনফিগার করা
 require('dotenv').config();
@@ -34,6 +35,8 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET;
 const MONGODB_URI = process.env.MONGODB_URI;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // নতুন: অ্যাডমিনের ইমেইল
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`; // নতুন: সার্ভারের বেস URL
 
 // MongoDB সংযোগ
 mongoose.connect(MONGODB_URI, {
@@ -44,7 +47,7 @@ mongoose.connect(MONGODB_URI, {
 
 // Nodemailer ট্রান্সপোর্টার কনফিগারেশন
 const transporter = nodemailer.createTransport({
-    service: 'gmail', 
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
@@ -78,11 +81,11 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
-// অ্যাডমিনকে ইমেইল নোটিফিকেশন পাঠানোর জন্য ফাংশন
+// অ্যাডমিনকে ইমেইল নোটিফিকেশন পাঠানোর জন্য ফাংশন, এখন বাটন সহ
 const sendAdminNotificationEmail = async (subject, htmlContent) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL, // অ্যাডমিনের ইমেইল
+      to: ADMIN_EMAIL,
       subject: subject,
       html: htmlContent
     };
@@ -356,8 +359,8 @@ app.post('/deposit', authMiddleware, upload, async (req, res) => {
     const userId = req.user.userId;
     const amountNum = Number(amount);
 
-    const previousDeposits = await Deposit.find({ userId });
-    const isFirstDeposit = previousDeposits.length === 0;
+    // ডিপোজিট রিকোয়েস্টের জন্য একটি অনন্য টোকেন তৈরি করা হচ্ছে
+    const approvalToken = crypto.randomBytes(32).toString('hex');
 
     const deposit = new Deposit({
       userId,
@@ -365,11 +368,12 @@ app.post('/deposit', authMiddleware, upload, async (req, res) => {
       phone,
       transactionId,
       method,
-      screenshotUrl // Cloudinary থেকে পাওয়া URL ডেটাবেসে সংরক্ষণ করা হচ্ছে
+      screenshotUrl,
+      status: 'pending', // নতুন: স্ট্যাটাস 'pending' হিসেবে শুরু হবে
+      approvalToken // নতুন: টোকেন সংরক্ষণ করা হচ্ছে
     });
     await deposit.save();
     
-    // ডিপোজিট রিকোয়েস্টের জন্য অ্যাডমিনকে ইমেইল নোটিফিকেশন পাঠানো হচ্ছে
     const user = await User.findById(userId);
     const subject = `নতুন ডিপোজিট রিকোয়েস্ট: ${user.name}`;
     const htmlContent = `
@@ -380,24 +384,17 @@ app.post('/deposit', authMiddleware, upload, async (req, res) => {
         <p><b>ট্রানজেকশন ID:</b> ${transactionId}</p>
         <p><b>মেথড:</b> ${method}</p>
         <p><b>রিকোয়েস্ট ID:</b> ${deposit._id}</p>
-        ${screenshotUrl ? `<p><a href="${screenshotUrl}">স্ক্রিনশট দেখুন</a></p>` : ''}
+        ${screenshotUrl ? `<p><a href="${screenshotUrl}" style="color: #007BFF;">স্ক্রিনশট দেখুন</a></p>` : ''}
+        <br/>
+        <div style="margin-top: 20px;">
+          <a href="${BASE_URL}/api/deposit/approve/${deposit._id}?token=${approvalToken}" style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-right: 10px;">✅ Approve</a>
+          <a href="${BASE_URL}/api/deposit/reject/${deposit._id}?token=${approvalToken}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">❌ Reject</a>
+        </div>
     `;
     sendAdminNotificationEmail(subject, htmlContent);
 
-    if (isFirstDeposit && amountNum >= 300) {
-      const referrer = await User.findById(user.referredBy);
-      if (referrer) {
-        referrer.balance += 20;
-        await referrer.save();
-
-        await Commission.create({
-          userId: new mongoose.Types.ObjectId(referrer._id),
-          amount: 20,
-          source: 'Referral',
-          note: `Referral reward for ${user.name}'s first deposit`
-        });
-      }
-    }
+    // প্রথম ডিপোজিটের রেফারেল কমিশন লজিক এখানে সরানো হয়েছে, অ্যাপ্রুভালের পর
+    // এটি এখন ডিপোজিট অ্যাপ্রুভ হওয়ার পর কার্যকর হবে
 
     res.send("✅ Deposit request submitted");
   } catch (err) {
@@ -416,6 +413,82 @@ app.get('/api/deposit-history', authMiddleware, async (req, res) => {
   }
 });
 
+// নতুন: ডিপোজিট অ্যাপ্রুভ করার রুট
+app.get('/api/deposit/approve/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.query;
+
+        const deposit = await Deposit.findById(id);
+
+        if (!deposit || deposit.approvalToken !== token || deposit.status !== 'pending') {
+            return res.status(400).send('Invalid or already processed request.');
+        }
+
+        const user = await User.findById(deposit.userId);
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+        
+        // ব্যালেন্স যোগ করা হচ্ছে
+        user.balance += deposit.amount;
+
+        // প্রথম ডিপোজিটের রেফারেল কমিশন লজিক
+        const isFirstDeposit = await Deposit.countDocuments({ userId: deposit.userId, status: 'approved' }) === 0;
+        if (isFirstDeposit && deposit.amount >= 300) {
+          const referrer = await User.findById(user.referredBy);
+          if (referrer) {
+            referrer.balance += 20;
+            await referrer.save();
+
+            await Commission.create({
+              userId: new mongoose.Types.ObjectId(referrer._id),
+              amount: 20,
+              source: 'Referral',
+              note: `Referral reward for ${user.name}'s first approved deposit`
+            });
+          }
+        }
+
+        await user.save();
+
+        // ডিপোজিট স্ট্যাটাস আপডেট করা হচ্ছে
+        deposit.status = 'approved';
+        deposit.approvalToken = null; // টোকেন বাতিল করা হচ্ছে
+        await deposit.save();
+
+        res.send(`<h1>✅ ডিপোজিট সফলভাবে অ্যাপ্রুভ করা হয়েছে!</h1><p>ইউজার: ${user.name}</p><p>অ্যামাউন্ট: ৳${deposit.amount}</p>`);
+    } catch (err) {
+        console.error('Deposit approve error:', err);
+        res.status(500).send('সার্ভার ত্রুটি');
+    }
+});
+
+// নতুন: ডিপোজিট রিজেক্ট করার রুট
+app.get('/api/deposit/reject/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.query;
+
+        const deposit = await Deposit.findById(id);
+
+        if (!deposit || deposit.approvalToken !== token || deposit.status !== 'pending') {
+            return res.status(400).send('Invalid or already processed request.');
+        }
+
+        const user = await User.findById(deposit.userId);
+        // ডিপোজিট স্ট্যাটাস আপডেট করা হচ্ছে
+        deposit.status = 'rejected';
+        deposit.approvalToken = null; // টোকেন বাতিল করা হচ্ছে
+        await deposit.save();
+        
+        res.send(`<h1>❌ ডিপোজিট সফলভাবে রিজেক্ট করা হয়েছে!</h1><p>ইউজার: ${user.name}</p><p>অ্যামাউন্ট: ৳${deposit.amount}</p>`);
+    } catch (err) {
+        console.error('Deposit reject error:', err);
+        res.status(500).send('সার্ভার ত্রুটি');
+    }
+});
+
 app.post('/withdraw', authMiddleware, async (req, res) => {
   try {
     const { amount, method, number } = req.body;
@@ -424,18 +497,22 @@ app.post('/withdraw', authMiddleware, async (req, res) => {
 
     if (user.balance < amount) return res.status(400).send("Insufficient balance");
 
+    // উইথড্র রিকোয়েস্টের জন্য একটি অনন্য টোকেন তৈরি করা হচ্ছে
+    const approvalToken = crypto.randomBytes(32).toString('hex');
+
     const withdraw = new Withdraw({
       userId: req.user.userId,
       amount,
       method,
-      number
+      number,
+      status: 'pending', // নতুন: স্ট্যাটাস 'pending' হিসেবে শুরু হবে
+      approvalToken // নতুন: টোকেন সংরক্ষণ করা হচ্ছে
     });
 
     await withdraw.save();
     user.balance -= amount;
     await user.save();
     
-    // উইথড্র রিকোয়েস্টের জন্য অ্যাডমিনকে ইমেইল নোটিফিকেশন পাঠানো হচ্ছে
     const subject = `নতুন উইথড্র রিকোয়েস্ট: ${user.name}`;
     const htmlContent = `
         <h1>নতুন উইথড্র রিকোয়েস্ট</h1>
@@ -444,6 +521,11 @@ app.post('/withdraw', authMiddleware, async (req, res) => {
         <p><b>উইথড্র নম্বর:</b> ${number}</p>
         <p><b>মেথড:</b> ${method}</p>
         <p><b>রিকোয়েস্ট ID:</b> ${withdraw._id}</p>
+        <br/>
+        <div style="margin-top: 20px;">
+          <a href="${BASE_URL}/api/withdraw/approve/${withdraw._id}?token=${approvalToken}" style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-right: 10px;">✅ Approve</a>
+          <a href="${BASE_URL}/api/withdraw/reject/${withdraw._id}?token=${approvalToken}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">❌ Reject</a>
+        </div>
     `;
     sendAdminNotificationEmail(subject, htmlContent);
 
@@ -463,6 +545,65 @@ app.get('/api/withdraw-history', authMiddleware, async (req, res) => {
     res.status(500).send("Error fetching withdraw history");
   }
 });
+
+// নতুন: উইথড্রল অ্যাপ্রুভ করার রুট
+app.get('/api/withdraw/approve/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.query;
+
+        const withdraw = await Withdraw.findById(id);
+
+        if (!withdraw || withdraw.approvalToken !== token || withdraw.status !== 'pending') {
+            return res.status(400).send('Invalid or already processed request.');
+        }
+
+        // উইথড্র স্ট্যাটাস আপডেট করা হচ্ছে
+        withdraw.status = 'approved';
+        withdraw.approvalToken = null;
+        await withdraw.save();
+
+        const user = await User.findById(withdraw.userId);
+        res.send(`<h1>✅ উইথড্রল সফলভাবে অ্যাপ্রুভ করা হয়েছে!</h1><p>ইউজার: ${user.name}</p><p>অ্যামাউন্ট: ৳${withdraw.amount}</p><p>অ্যাডমিনকে ম্যানুয়ালি পেমেন্ট সম্পন্ন করতে হবে।</p>`);
+    } catch (err) {
+        console.error('Withdraw approve error:', err);
+        res.status(500).send('সার্ভার ত্রুটি');
+    }
+});
+
+// নতুন: উইথড্রল রিজেক্ট করার রুট
+app.get('/api/withdraw/reject/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.query;
+
+        const withdraw = await Withdraw.findById(id);
+
+        if (!withdraw || withdraw.approvalToken !== token || withdraw.status !== 'pending') {
+            return res.status(400).send('Invalid or already processed request.');
+        }
+        
+        const user = await User.findById(withdraw.userId);
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+        
+        // ব্যালেন্স ফেরত দেওয়া হচ্ছে
+        user.balance += withdraw.amount;
+        await user.save();
+
+        // উইথড্র স্ট্যাটাস আপডেট করা হচ্ছে
+        withdraw.status = 'rejected';
+        withdraw.approvalToken = null;
+        await withdraw.save();
+
+        res.send(`<h1>❌ উইথড্রল সফলভাবে রিজেক্ট করা হয়েছে!</h1><p>ইউজার: ${user.name}</p><p>অ্যামাউন্ট: ৳${withdraw.amount}</p><p>ব্যালেন্স ইউজারকে ফেরত দেওয়া হয়েছে।</p>`);
+    } catch (err) {
+        console.error('Withdraw reject error:', err);
+        res.status(500).send('সার্ভার ত্রুটি');
+    }
+});
+
 
 app.post('/api/buy-package', authMiddleware, async (req, res) => {
   try {
@@ -581,7 +722,7 @@ app.get('/api/leaderboard', authMiddleware, async (req, res) => {
     try {
       const currentUserId = req.user.userId;
       const users = await User.find({});
-      const deposits = await Deposit.find({});
+      const deposits = await Deposit.find({ status: 'approved' });
 
       const usersWithStats = users.map(user => {
           const totalDeposits = deposits
