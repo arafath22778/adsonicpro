@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -285,4 +285,107 @@ a {
       };
     </script>
   </body>
+</html>-->
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adsonicpro - লঞ্চিং কাউন্টডাউন</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="countdown-container" class="bg-gray-800 p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-xl w-full border-2 border-green-500">
+        <div id="main-content" class="hidden">
+            <!-- কাউন্টডাউন শেষ হলে এই কন্টেন্ট দেখা যাবে -->
+            <h1 class="text-3xl md:text-5xl font-bold text-green-400 mb-4 animate-bounce">স্বাগতম!</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">এখন আপনি আমাদের ওয়েবসাইটে প্রবেশ করতে পারবেন।</p>
+            <a href="/login" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                লগইন করুন
+            </a>
+        </div>
+       <img src="https://ik.imagekit.io/ubdzcqpss/Lucid_Realism_A_sleek_modern_and_professional_logo_design_for__3-removebg-preview.png?updatedAt=1754931110372" style="color: whitesmoke; background-color:white ; border-radius: 16px; width: 500px;"><br />
+        <div id="countdown-wrapper">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-green-400 mb-6">শিগগিরই আসছি!</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">আমাদের ওয়েবসাইট লঞ্চ হতে বাকি আছে:</p>
+            
+            <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                <!-- দিন -->
+                <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
+                    <span id="days" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
+                    <span class="text-xs md:text-sm text-gray-400">দিন</span>
+                </div>
+                <span class="text-2xl md:text-4xl font-bold">:</span>
+                <!-- ঘন্টা -->
+                <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
+                    <span id="hours" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
+                    <span class="text-xs md:text-sm text-gray-400">ঘন্টা</span>
+                </div>
+                <span class="text-2xl md:text-4xl font-bold">:</span>
+                <!-- মিনিট -->
+                <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
+                    <span id="minutes" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
+                    <span class="text-xs md:text-sm text-gray-400">মিনিট</span>
+                </div>
+                <span class="text-2xl md:text-4xl font-bold">:</span>
+                <!-- সেকেন্ড -->
+                <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
+                    <span id="seconds" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
+                    <span class="text-xs md:text-sm text-gray-400">সেকেন্ড</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const countdownWrapper = document.getElementById('countdown-wrapper');
+            const mainContent = document.getElementById('main-content');
+            
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+
+            // ######### এখানে আপনার লঞ্চের তারিখ এবং সময় সেট করুন #########
+            // তারিখ ফরম্যাট: 'মাস দিন, বছর ঘন্টা:মিনিট:সেকেন্ড'
+            const launchDate = new Date('August 18, 2025 18:05:00').getTime();
+
+            const countdown = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = launchDate - now;
+
+                if (distance < 0) {
+                    // কাউন্টডাউন শেষ হয়ে গেলে
+                    clearInterval(countdown);
+                    countdownWrapper.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    // কাউন্টডাউন শেষ হলে স্বয়ংক্রিয়ভাবে লগইন পেজে নিয়ে যাবে
+                    window.location.href = "/login";
+                } else {
+                    // সময় গণনা করা
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // শূন্য যোগ করা যদি সংখ্যা একক হয়
+                    const formatTime = (time) => time < 10 ? `0${time}` : time;
+
+                    daysEl.textContent = formatTime(days);
+                    hoursEl.textContent = formatTime(hours);
+                    minutesEl.textContent = formatTime(minutes);
+                    secondsEl.textContent = formatTime(seconds);
+                }
+            }, 100);
+        });
+    </script>
+
+</body>
 </html>
