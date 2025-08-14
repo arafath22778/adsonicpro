@@ -1,4 +1,5 @@
-<!--<!DOCTYPE html>
+<!--
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -287,11 +288,11 @@ a {
   </body>
 </html>-->
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adsonicpro - লঞ্চিং কাউন্টডাউন</title>
+    <title>Adsonicpro - Launch Countdown</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -303,42 +304,76 @@ a {
 
     <div id="countdown-container" class="bg-gray-800 p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-xl w-full border-2 border-green-500">
         <div id="main-content" class="hidden">
-            <!-- কাউন্টডাউন শেষ হলে এই কন্টেন্ট দেখা যাবে -->
-            <h1 class="text-3xl md:text-5xl font-bold text-green-400 mb-4 animate-bounce">স্বাগতম!</h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8">এখন আপনি আমাদের ওয়েবসাইটে প্রবেশ করতে পারবেন।</p>
+            <!-- Content displayed after the countdown ends -->
+            <h1 class="text-3xl md:text-5xl font-bold text-green-400 mb-4 animate-bounce">Welcome!</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">You can now access our website.</p>
             <a href="/login" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
-                লগইন করুন
+                Login
             </a>
         </div>
-       <img src="https://ik.imagekit.io/ubdzcqpss/Lucid_Realism_A_sleek_modern_and_professional_logo_design_for__3-removebg-preview.png?updatedAt=1754931110372" style="color: whitesmoke; background-color:white ; border-radius: 16px; width: 500px;"><br />
+        <img src="https://ik.imagekit.io/ubdzcqpss/Lucid_Realism_A_sleek_modern_and_professional_logo_design_for__3-removebg-preview.png?updatedAt=1754931110372" style="background-color: white; border-radius: 16px; width: 500px;" class="mb-6 mx-auto" />
         <div id="countdown-wrapper">
-            <h1 class="text-3xl md:text-5xl font-extrabold text-green-400 mb-6">শিগগিরই আসছি!</h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8">আমাদের ওয়েবসাইট লঞ্চ হতে বাকি আছে:</p>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-green-400 mb-6">Coming Soon!</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">Our website launch is in:</p>
             
             <div class="flex justify-center items-center space-x-2 md:space-x-4">
-                <!-- দিন -->
+                <!-- Days -->
                 <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
                     <span id="days" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
-                    <span class="text-xs md:text-sm text-gray-400">দিন</span>
+                    <span class="text-xs md:text-sm text-gray-400">Days</span>
                 </div>
                 <span class="text-2xl md:text-4xl font-bold">:</span>
-                <!-- ঘন্টা -->
+                <!-- Hours -->
                 <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
                     <span id="hours" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
-                    <span class="text-xs md:text-sm text-gray-400">ঘন্টা</span>
+                    <span class="text-xs md:text-sm text-gray-400">Hours</span>
                 </div>
                 <span class="text-2xl md:text-4xl font-bold">:</span>
-                <!-- মিনিট -->
+                <!-- Minutes -->
                 <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
                     <span id="minutes" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
-                    <span class="text-xs md:text-sm text-gray-400">মিনিট</span>
+                    <span class="text-xs md:text-sm text-gray-400">Minutes</span>
                 </div>
                 <span class="text-2xl md:text-4xl font-bold">:</span>
-                <!-- সেকেন্ড -->
+                <!-- Seconds -->
                 <div class="flex flex-col items-center p-3 md:p-4 bg-gray-700 rounded-xl">
                     <span id="seconds" class="text-4xl md:text-6xl font-bold text-green-300">00</span>
-                    <span class="text-xs md:text-sm text-gray-400">সেকেন্ড</span>
+                    <span class="text-xs md:text-sm text-gray-400">Seconds</span>
                 </div>
+            </div>
+
+            <!-- Earning information section -->
+            <div class="mt-8 text-left bg-gray-700 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold text-green-400 mb-4">How can I earn from this website?</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li><span class="font-bold">Watching Ads:</span> You can earn a fixed amount (৳20) for each ad you watch. The number of ads you can watch per day depends on the package you purchase.</li>
+                    <li><span class="font-bold">Referral Commission:</span> When a new user signs up using your referral code and makes their first deposit of at least ৳300, you will receive a bonus commission of ৳20.</li>
+                    <li><span class="font-bold">Bonus Codes:</span> Upon successful registration, you will receive a special bonus code via email. By redeeming this code, you can get a bonus of ৳50 on your first deposit.</li>
+                </ul>
+            </div>
+            
+            <!-- Deposit and Withdraw information section -->
+            <div class="mt-8 text-left bg-gray-700 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold text-green-400 mb-4">How to Deposit & Withdraw</h2>
+                
+                <h3 class="text-xl font-semibold text-green-300 mt-4 mb-2">Deposit Process</h3>
+                <p class="text-gray-300 mb-4">To deposit money into your account, follow these steps:</p>
+                <ul class="list-decimal list-inside space-y-2 text-gray-300">
+                    <li>Navigate to the <span class="font-bold">"Deposit"</span> page.</li>
+                    <li>Choose your preferred payment method and enter the amount you wish to deposit.</li>
+                    <li>Make the payment to the provided account and note the transaction ID (TrxID).</li>
+                    <li>Upload a screenshot of the payment and submit your request.</li>
+                    <li>The admin will verify your payment and add the amount to your balance.</li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold text-green-300 mt-6 mb-2">Withdraw Process</h3>
+                <p class="text-gray-300 mb-4">To withdraw money from your account, follow these steps:</p>
+                <ul class="list-decimal list-inside space-y-2 text-gray-300">
+                    <li>Navigate to the <span class="font-bold">"Withdraw"</span> page.</li>
+                    <li>Enter the amount you wish to withdraw and select your preferred withdrawal method.</li>
+                    <li>Submit your withdrawal request.</li>
+                    <li>The admin will approve your request and process your payment to the provided account.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -353,8 +388,8 @@ a {
             const minutesEl = document.getElementById('minutes');
             const secondsEl = document.getElementById('seconds');
 
-            // ######### এখানে আপনার লঞ্চের তারিখ এবং সময় সেট করুন #########
-            // তারিখ ফরম্যাট: 'মাস দিন, বছর ঘন্টা:মিনিট:সেকেন্ড'
+            // ######### Set your launch date and time here #########
+            // Date format: 'Month Day, Year Hour:Minute:Second'
             const launchDate = new Date('August 18, 2025 18:05:00').getTime();
 
             const countdown = setInterval(() => {
@@ -362,20 +397,20 @@ a {
                 const distance = launchDate - now;
 
                 if (distance < 0) {
-                    // কাউন্টডাউন শেষ হয়ে গেলে
+                    // When the countdown ends
                     clearInterval(countdown);
                     countdownWrapper.classList.add('hidden');
                     mainContent.classList.remove('hidden');
-                    // কাউন্টডাউন শেষ হলে স্বয়ংক্রিয়ভাবে লগইন পেজে নিয়ে যাবে
+                    // Automatically redirect to the login page after the countdown ends
                     window.location.href = "/login";
                 } else {
-                    // সময় গণনা করা
+                    // Calculate time
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    // শূন্য যোগ করা যদি সংখ্যা একক হয়
+                    // Add leading zeros if the number is a single digit
                     const formatTime = (time) => time < 10 ? `0${time}` : time;
 
                     daysEl.textContent = formatTime(days);
