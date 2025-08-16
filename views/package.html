@@ -282,7 +282,7 @@
         </div>
         <i class="fas fa-info-circle"
             style="position: absolute; top: 25px; right: 25px; color: #007bff; cursor: pointer; font-size: 24px;"
-            onclick="showUniversalPopup('একজন ব্যক্তি যতবার মনে চায় ততবার একই package কিনতে পারবে।আর ভিন্ন package তো আছেই। ৫০০০ বা তার থেকে বড় package কিনলে একাধিক এড একসাথে দেখতে পারবে।')"></i>
+            onclick="showUniversalPopup('একজন ব্যক্তি যতবার মনে চায় ততবার একই package কিনতে পারবে।আর ভিন্ন package তো আছেই। ৫০০০ বা তার থেকে বড় package কিনলে একাধিক এড একসাথে দেখতে পারবে।')"></i>
         <div id="user-info"></div>
         <h3>Available Packages:</h3>
         <div id="packages" class="flex"></div>
@@ -345,6 +345,8 @@
 
 
         async function loadPackages() {
+            const container = document.getElementById('packages');
+            container.innerHTML = '<p style="text-align:center; color:#555; font-size:1.2rem;">Loading packages...</p>';
             try {
                 const res = await fetch('/api/packages');
                 if (!res.ok) {
@@ -352,7 +354,6 @@
                 }
 
                 const packages = await res.json();
-                const container = document.getElementById('packages');
                 container.innerHTML = '';
 
                 packages.forEach((pkg, index) => {
@@ -383,6 +384,7 @@
                 });
             } catch (error) {
                 console.error("Error loading packages:", error);
+                container.innerHTML = '<p style="text-align:center; color:#dc3545; font-size:1.2rem;">Failed to load packages. Please try again.</p>';
                 showToast('Failed to load packages.', 'error');
             }
         }
